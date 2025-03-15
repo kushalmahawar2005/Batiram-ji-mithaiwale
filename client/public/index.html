@@ -56,7 +56,7 @@
             </div>
             <div class="cart-total">
                 <h3>Total: <span id="cartTotal">₹0</span></h3>
-                <button class="checkout-btn">Proceed to Checkout</button>
+                <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
             </div>
         </div>
     </div>
@@ -626,7 +626,7 @@
     <!-- Sweet Details Modal -->
     <div class="modal" id="sweetModal">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            <span class="close-modal" onclick="closeModal('sweetModal')">&times;</span>
             <div class="modal-body">
                 <!-- Content will be dynamically added here -->
             </div>
@@ -1082,81 +1082,59 @@
         </div>
     </footer>
 
+    <!-- Modals Section -->
+    <div class="modal" id="sweetModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('sweetModal')">&times;</span>
+            <div class="modal-body">
+                <!-- Content will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-view-modal" id="quickViewModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('quickViewModal')">&times;</span>
+            <div class="modal-body">
+                <!-- Content will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="script.js"></script>
 
-    <!-- Admin Access Script -->
     <script>
-        // Quick admin access with Alt + A
-        document.addEventListener('keydown', (e) => {
-            if (e.altKey && e.key.toLowerCase() === 'a') {
-                e.preventDefault();
-                const adminToken = localStorage.getItem('adminToken');
-                const sessionExpiry = localStorage.getItem('sessionExpiry');
-                
-                if (adminToken && sessionExpiry && new Date().getTime() < parseInt(sessionExpiry)) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'admin-login.html';
-                }
-            }
-        });
-
-        // Check admin session status
-        const adminLink = document.getElementById('adminLink');
-        const adminToken = localStorage.getItem('adminToken');
-        const sessionExpiry = localStorage.getItem('sessionExpiry');
-        
-        if (adminToken && sessionExpiry && new Date().getTime() < parseInt(sessionExpiry)) {
-            adminLink.innerHTML = '<i class="fas fa-user-shield"></i> Admin Dashboard';
+        // Global modal handling
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
         }
-    </script>
 
-    <!-- Add this modal section at the end of the body, before the scripts -->
-    <div class="sweet-modal" id="signatureModal">
-        <div class="modal-content">
-            <!-- Content will be dynamically added -->
-        </div>
-    </div>
-    <div class="sweet-modal" id="namkeenModal">
-        <div class="modal-content">
-            <!-- Content will be dynamically added -->
-        </div>
-    </div>
-    <div class="sweet-modal" id="sweetModal">
-        <div class="modal-content">
-            <!-- Content will be dynamically added -->
-        </div>
-    </div>
-
-    <Checkout total={cartTotal} items={cartItems} />
-
-    <script>
         // Function to show quick view
         function showQuickView(sweetId) {
             const sweet = sweetDetails[sweetId];
             if (!sweet) return;
 
-            const quickViewModal = document.createElement('div');
-            quickViewModal.className = 'quick-view-modal';
-            quickViewModal.innerHTML = `
-                <div class="quick-view-content">
-                    <button class="close-quick-view">&times;</button>
-                    <div class="quick-view-grid">
-                        <div class="quick-view-image">
-                            <img src="${sweet.image}" alt="${sweet.title}" onerror="this.src='images/placeholder.jpg'">
-                            ${sweet.badge ? `<span class="sweet-badge">${sweet.badge}</span>` : ''}
+            const modal = document.getElementById('quickViewModal');
+            const modalBody = modal.querySelector('.modal-body');
+
+            modalBody.innerHTML = `
+                <div class="quick-view-grid">
+                    <div class="quick-view-image">
+                        <img src="${sweet.image}" alt="${sweet.title}" onerror="this.src='images/placeholder.jpg'">
+                        ${sweet.badge ? `<span class="sweet-badge">${sweet.badge}</span>` : ''}
+                    </div>
+                    <div class="quick-view-details">
+                        <h2>${sweet.title}</h2>
+                        <p class="price">₹${sweet.price}</p>
+                        <p class="description">${sweet.description}</p>
+                        <div class="product-info">
+                            <p><i class="fas fa-clock"></i> <strong>Shelf Life:</strong> ${sweet.shelfLife}</p>
+                            <p><i class="fas fa-star"></i> <strong>Rating:</strong> ${sweet.rating}</p>
+                            <p><i class="fas fa-box"></i> <strong>Quantity:</strong> ${sweet.quantity}</p>
                         </div>
-                        <div class="quick-view-details">
-                            <h2>${sweet.title}</h2>
-                            <p class="price">₹${sweet.price}</p>
-                            <p class="description">${sweet.description}</p>
-                            <div class="product-info">
-                                <p><strong>Shelf Life:</strong> ${sweet.shelfLife}</p>
-                                <p><strong>Rating:</strong> ${sweet.rating}</p>
-                                <p><strong>Quantity:</strong> ${sweet.quantity}</p>
-                            </div>
-                            <button class="view-details-btn" onclick="showSweetDetails('${sweetId}'); this.closest('.quick-view-modal').remove();">
+                        <div class="button-group">
+                            <button class="view-details-btn" onclick="showSweetDetails('${sweetId}'); closeModal('quickViewModal');">
                                 View Full Details
                             </button>
                             <button class="add-to-cart-btn" onclick="addToCart('${sweetId}')">
@@ -1167,23 +1145,13 @@
                 </div>
             `;
 
-            document.body.appendChild(quickViewModal);
-
-            // Close quick view when clicking outside or on close button
-            quickViewModal.addEventListener('click', (e) => {
-                if (e.target === quickViewModal || e.target.classList.contains('close-quick-view')) {
-                    quickViewModal.remove();
-                }
-            });
+            modal.classList.add('active');
         }
 
         // Function to show sweet details
         function showSweetDetails(sweetId) {
             const sweet = sweetDetails[sweetId];
-            if (!sweet) {
-                console.error('Sweet not found:', sweetId);
-                return;
-            }
+            if (!sweet) return;
 
             const modal = document.getElementById('sweetModal');
             const modalBody = modal.querySelector('.modal-body');
@@ -1216,29 +1184,6 @@
                             `).join('')}
                         </div>
 
-                        <div class="details-section">
-                            <h3>Product Details</h3>
-                            <ul>
-                                <li><i class="fas fa-box"></i> Quantity: ${sweet.quantity}</li>
-                                <li><i class="fas fa-clock"></i> Shelf Life: ${sweet.shelfLife}</li>
-                                <li><i class="fas fa-star"></i> Rating: ${sweet.rating}</li>
-                            </ul>
-                        </div>
-
-                        <div class="details-section">
-                            <h3>Ingredients</h3>
-                            <p>${sweet.ingredients}</p>
-                        </div>
-
-                        <div class="details-section">
-                            <h3>Nutritional Information</h3>
-                            <ul>
-                                ${Object.entries(sweet.nutritionInfo).map(([key, value]) => `
-                                    <li><strong>${key}:</strong> ${value}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-
                         <div class="quantity-selector">
                             <label>Quantity:</label>
                             <div class="quantity-controls">
@@ -1256,18 +1201,6 @@
             `;
 
             modal.classList.add('active');
-
-            // Close modal functionality
-            const closeBtn = modal.querySelector('.close-modal');
-            closeBtn.onclick = function() {
-                modal.classList.remove('active');
-            };
-
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    modal.classList.remove('active');
-                }
-            };
         }
 
         // Function to update quantity
@@ -1277,6 +1210,164 @@
             value = Math.max(1, Math.min(20, value)); // Clamp between 1 and 20
             input.value = value;
         }
+
+        // Sweet details data
+        const sweetDetails = {
+            'kaju-katli': {
+                id: 'kaju-katli',
+                title: 'Kaju Katli',
+                price: 800,
+                description: 'Delicious kaju katli with a crunchy texture and a rich, creamy filling',
+                image: 'images/signature/kaju-katli.jpg',
+                badge: 'Bestseller',
+                shelfLife: '7 days',
+                rating: '4.9/5',
+                quantity: '250g',
+                features: [
+                    { icon: 'fa-star', text: 'Premium Quality' },
+                    { icon: 'fa-clock', text: '7 Days Shelf Life' },
+                    { icon: 'fa-award', text: 'Most Popular' }
+                ]
+            },
+            'rasmalai': {
+                id: 'rasmalai',
+                title: 'Rasmalai',
+                price: 600,
+                description: 'Soft cottage cheese dumplings soaked in sweetened milk',
+                image: 'images/signature/rasmalai.jpg',
+                badge: 'Popular',
+                shelfLife: '5 days',
+                rating: '4.8/5',
+                quantity: '500g',
+                features: [
+                    { icon: 'fa-star', text: 'Fresh Daily' },
+                    { icon: 'fa-clock', text: '5 Days Shelf Life' },
+                    { icon: 'fa-award', text: 'Chef\'s Special' }
+                ]
+            }
+        };
+
+        // Cart functionality
+        let cart = [];
+        
+        function toggleCart() {
+            const cartModal = document.getElementById('cartModal');
+            cartModal.classList.toggle('active');
+        }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) {
+                showNotification('Your cart is empty!', 'error');
+                return;
+            }
+
+            // Calculate total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Save cart data to localStorage
+            const cartData = {
+                items: cart.map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.image
+                })),
+                total: total
+            };
+
+            localStorage.setItem('cartData', JSON.stringify(cartData));
+
+            // Redirect to payment page
+            window.location.href = 'payment.html';
+        }
+
+        function addToCart(sweetId, fromModal = false) {
+            const sweet = sweetDetails[sweetId];
+            if (!sweet) {
+                showNotification('Product not found!', 'error');
+                return;
+            }
+
+            const quantity = fromModal && document.getElementById('sweetQuantity') 
+                ? parseInt(document.getElementById('sweetQuantity').value) 
+                : 1;
+
+            const existingItem = cart.find(item => item.id === sweetId);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: sweetId,
+                    title: sweet.title,
+                    price: sweet.price,
+                    quantity: quantity,
+                    image: sweet.image
+                });
+            }
+
+            updateCartUI();
+            showNotification('Item added to cart!', 'success');
+
+            if (fromModal) {
+                closeModal('sweetModal');
+            }
+        }
+
+        function updateCartUI() {
+            const cartCount = document.querySelector('.cart-count');
+            const cartTotal = document.getElementById('cartTotal');
+            const cartItems = document.querySelector('.cart-items');
+
+            const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            cartCount.textContent = totalQuantity;
+            cartTotal.textContent = `₹${totalPrice}`;
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.title}" onerror="this.src='images/placeholder.jpg'">
+                    <div class="cart-item-details">
+                        <h4>${item.title}</h4>
+                        <p>₹${item.price} x ${item.quantity}</p>
+                    </div>
+                    <button onclick="removeFromCart('${item.id}')">&times;</button>
+                </div>
+            `).join('');
+        }
+
+        function removeFromCart(sweetId) {
+            cart = cart.filter(item => item.id !== sweetId);
+            updateCartUI();
+            showNotification('Item removed from cart!', 'info');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Add fade-in class
+            setTimeout(() => notification.classList.add('show'), 10);
+
+            // Remove notification after delay
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+
+        // Initialize cart UI on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartUI();
+        });
     </script>
 </body>
 </html> 

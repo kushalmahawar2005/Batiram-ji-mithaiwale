@@ -17,28 +17,16 @@
             gap: 30px;
         }
 
-        .order-details {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .order-summary {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 20px;
-        }
-
         .form-section {
-            margin-bottom: 30px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         .form-section h3 {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #333;
         }
 
@@ -61,23 +49,6 @@
             font-size: 16px;
         }
 
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .summary-total {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #ddd;
-            font-size: 18px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-        }
-
         .payment-methods {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -86,50 +57,121 @@
         }
 
         .payment-method {
-            border: 1px solid #ddd;
-            border-radius: 4px;
             padding: 15px;
-            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             cursor: pointer;
+            text-align: center;
             transition: all 0.3s ease;
         }
 
         .payment-method:hover {
-            border-color: #ffd700;
+            border-color: #e44d26;
         }
 
         .payment-method.selected {
-            border-color: #ffd700;
-            background-color: #fff9e6;
+            border-color: #e44d26;
+            background-color: #fff5f3;
         }
 
         .payment-method i {
             font-size: 24px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            color: #e44d26;
+        }
+
+        .order-summary {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        .order-summary h3 {
+            margin-bottom: 20px;
             color: #333;
         }
 
+        .order-items {
+            margin-bottom: 20px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+
+        .order-item-details {
+            flex: 1;
+        }
+
+        .order-item-details h4 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .order-item-details p {
+            margin: 5px 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .order-total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .total-row.final {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e44d26;
+        }
+
         .place-order-btn {
-            background-color: #ffd700;
-            color: #000;
+            width: 100%;
+            padding: 15px;
+            background-color: #e44d26;
+            color: white;
             border: none;
-            padding: 15px 30px;
             border-radius: 4px;
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            width: 100%;
+            transition: background-color 0.3s ease;
             margin-top: 20px;
-            transition: all 0.3s ease;
         }
 
         .place-order-btn:hover {
-            background-color: #ffed4a;
+            background-color: #d04323;
         }
 
         @media (max-width: 768px) {
             .payment-container {
                 grid-template-columns: 1fr;
+            }
+
+            .order-summary {
+                position: static;
             }
         }
     </style>
@@ -153,8 +195,7 @@
     </header>
 
     <div class="payment-container">
-        <div class="order-details">
-            <h2>Checkout</h2>
+        <div class="checkout-form">
             <form id="paymentForm" onsubmit="processPayment(event)">
                 <div class="form-section">
                     <h3>Personal Information</h3>
@@ -197,82 +238,217 @@
                     <div class="payment-methods">
                         <div class="payment-method" onclick="selectPaymentMethod('card')">
                             <i class="fas fa-credit-card"></i>
-                            <span>Card</span>
+                            <p>Card</p>
                         </div>
                         <div class="payment-method" onclick="selectPaymentMethod('upi')">
                             <i class="fas fa-mobile-alt"></i>
-                            <span>UPI</span>
+                            <p>UPI</p>
                         </div>
                         <div class="payment-method" onclick="selectPaymentMethod('cod')">
                             <i class="fas fa-money-bill-wave"></i>
-                            <span>Cash on Delivery</span>
+                            <p>Cash on Delivery</p>
+                        </div>
+                    </div>
+
+                    <!-- UPI Payment Details -->
+                    <div id="upiDetails" style="display: none; margin-top: 20px;">
+                        <div class="form-group">
+                            <label for="upiId">UPI ID</label>
+                            <input type="text" id="upiId" placeholder="Enter your UPI ID (e.g., name@upi)" pattern="[a-zA-Z0-9._-]+@[a-zA-Z]{3,}" title="Please enter a valid UPI ID">
+                        </div>
+                        <div class="upi-qr" style="text-align: center; margin-top: 20px;">
+                            <img src="images/upi-qr.png" alt="UPI QR Code" style="max-width: 200px;" onerror="this.style.display='none'">
+                            <p style="margin-top: 10px; color: #666;">Scan QR code or enter UPI ID</p>
+                            <p style="color: #e44d26; font-weight: 500;">UPI ID: bastiramji@upi</p>
                         </div>
                     </div>
                 </div>
-
-                <button type="submit" class="place-order-btn">Place Order</button>
             </form>
         </div>
 
         <div class="order-summary">
             <h3>Order Summary</h3>
-            <div id="summaryItems"></div>
-            <div class="summary-total">
-                <span>Total:</span>
-                <span id="summaryTotal"></span>
+            <div class="order-items" id="orderItems">
+                <!-- Order items will be dynamically added here -->
             </div>
+            <div class="order-total">
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">₹0</span>
+                </div>
+                <div class="total-row">
+                    <span>Delivery Fee</span>
+                    <span id="deliveryFee">₹40</span>
+                </div>
+                <div class="total-row final">
+                    <span>Total</span>
+                    <span id="total">₹0</span>
+                </div>
+            </div>
+            <button class="place-order-btn" onclick="placeOrder()">Place Order</button>
         </div>
     </div>
 
     <script>
         // Load cart data from localStorage
-        const cartData = JSON.parse(localStorage.getItem('cartData'));
-        
-        if (!cartData || !cartData.items || cartData.items.length === 0) {
-            window.location.href = 'sweets.html';
-        }
-
-        // Display order summary
-        const summaryItems = document.getElementById('summaryItems');
-        const summaryTotal = document.getElementById('summaryTotal');
-
-        summaryItems.innerHTML = cartData.items.map(item => `
-            <div class="summary-item">
-                <span>${item.title} × ${item.quantity}</span>
-                <span>₹${item.price * item.quantity}</span>
-            </div>
-        `).join('');
-
-        summaryTotal.textContent = `₹${cartData.total}`;
-
-        // Payment method selection
+        let cartData = JSON.parse(localStorage.getItem('cartData')) || { items: [], total: 0 };
         let selectedPaymentMethod = '';
 
+        // Initialize the page
+        window.onload = function() {
+            if (!cartData.items.length) {
+                window.location.href = 'sweets.html';
+                return;
+            }
+            updateOrderSummary();
+        };
+
+        // Update order summary
+        function updateOrderSummary() {
+            const orderItems = document.getElementById('orderItems');
+            const subtotal = document.getElementById('subtotal');
+            const total = document.getElementById('total');
+            const deliveryFee = 40;
+
+            orderItems.innerHTML = cartData.items.map(item => `
+                <div class="order-item">
+                    <img src="${item.image}" alt="${item.title}" onerror="this.src='images/placeholder.jpg'">
+                    <div class="order-item-details">
+                        <h4>${item.title}</h4>
+                        <p>₹${item.price} x ${item.quantity}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            subtotal.textContent = `₹${cartData.total}`;
+            total.textContent = `₹${cartData.total + deliveryFee}`;
+        }
+
+        // Handle payment method selection
         function selectPaymentMethod(method) {
             selectedPaymentMethod = method;
             document.querySelectorAll('.payment-method').forEach(el => {
                 el.classList.remove('selected');
             });
-            document.querySelector(`.payment-method:nth-child(${
-                method === 'card' ? 1 : method === 'upi' ? 2 : 3
-            })`).classList.add('selected');
+            event.currentTarget.classList.add('selected');
+
+            // Show/hide UPI details
+            const upiDetails = document.getElementById('upiDetails');
+            upiDetails.style.display = method === 'upi' ? 'block' : 'none';
         }
 
-        // Process payment
-        function processPayment(event) {
-            event.preventDefault();
-
+        // Place order
+        function placeOrder() {
             if (!selectedPaymentMethod) {
-                alert('Please select a payment method');
+                showNotification('Please select a payment method', 'error');
                 return;
             }
 
-            // Here you would typically send the order to a server
-            // For now, we'll just show a success message and redirect
+            const form = document.getElementById('paymentForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
-            alert('Order placed successfully! Thank you for shopping with us.');
-            localStorage.removeItem('cartData'); // Clear cart data
-            window.location.href = 'index.html'; // Redirect to home page
+            // Collect order data
+            const orderData = {
+                personalInfo: {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                },
+                address: {
+                    street: document.getElementById('street').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    pincode: document.getElementById('pincode').value
+                },
+                paymentMethod: selectedPaymentMethod,
+                items: cartData.items,
+                total: cartData.total + 40
+            };
+
+            // Handle different payment methods
+            switch(selectedPaymentMethod) {
+                case 'card':
+                    initiateCardPayment(orderData);
+                    break;
+                case 'upi':
+                    initiateUPIPayment(orderData);
+                    break;
+                case 'cod':
+                    processCODOrder(orderData);
+                    break;
+            }
+        }
+
+        // Payment processing functions
+        function initiateCardPayment(orderData) {
+            // Initialize Razorpay
+            const options = {
+                key: 'YOUR_RAZORPAY_KEY',
+                amount: orderData.total * 100, // Amount in paise
+                currency: 'INR',
+                name: 'Bastiramji Mithai Wale',
+                description: 'Sweet Purchase',
+                handler: function(response) {
+                    processSuccessfulPayment(orderData, response.razorpay_payment_id);
+                }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        }
+
+        function initiateUPIPayment(orderData) {
+            const upiId = document.getElementById('upiId').value;
+            
+            if (!upiId && !confirm('Would you like to proceed with scanning the QR code?')) {
+                return;
+            }
+
+            // Save order data for confirmation page
+            localStorage.setItem('lastOrder', JSON.stringify({
+                ...orderData,
+                paymentMethod: 'UPI Payment'
+            }));
+
+            // Show processing message
+            showNotification('Processing UPI payment...', 'info');
+
+            // Simulate UPI payment processing
+            setTimeout(() => {
+                processSuccessfulPayment(orderData, 'UPI-' + Date.now());
+            }, 2000);
+        }
+
+        function processCODOrder(orderData) {
+            // Process COD order
+            processSuccessfulPayment(orderData, 'COD-' + Date.now());
+        }
+
+        function processSuccessfulPayment(orderData, paymentId) {
+            // Clear cart data
+            localStorage.removeItem('cartData');
+            
+            // Show success message
+            showNotification('Order placed successfully!', 'success');
+            
+            // Redirect to confirmation page after a delay
+            setTimeout(() => {
+                window.location.href = 'order-confirmation.html?orderId=' + paymentId;
+            }, 2000);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
         }
     </script>
 </body>
