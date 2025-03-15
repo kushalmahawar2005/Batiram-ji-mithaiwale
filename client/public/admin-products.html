@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Management - Bastiramji Mithai Wale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo/bmw-logo.jpg" alt="Logo" class="logo">
+                <h2>Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="admin-orders.html" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="admin-products.html" class="nav-link active">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="admin-inventory.html" class="nav-link">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventory</span>
+                </a>
+                <a href="admin-customers.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </a>
+                <a href="admin-analytics.html" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="admin-settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-box">
+                    <input type="text" placeholder="Search products...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="header-right">
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="admin-profile">
+                        <img src="https://via.placeholder.com/40" alt="Admin">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="content-header">
+                    <h1>Products Management</h1>
+                    <button class="add-product-btn" onclick="openAddProductModal()">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
+                </div>
+
+                <div class="products-grid">
+                    <!-- Product cards will be dynamically added here -->
+                </div>
+
+                <!-- Add Product Modal -->
+                <div class="modal" id="addProductModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Add New Product</h2>
+                            <button class="close-modal">&times;</button>
+                        </div>
+                        <form class="product-form" id="productForm">
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="sweets">Sweets</option>
+                                    <option value="namkeen">Namkeen</option>
+                                    <option value="gift-boxes">Gift Boxes</option>
+                                    <option value="festival-special">Festival Special</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Price (₹)</label>
+                                <input type="number" name="price" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Stock</label>
+                                <input type="number" name="stock" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea name="description" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Product Image</label>
+                                <input type="file" name="image" accept="image/*" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Additional Details</label>
+                                <div class="additional-details">
+                                    <div class="detail-item">
+                                        <label>Shelf Life (days)</label>
+                                        <input type="number" name="shelfLife" required>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Weight (g)</label>
+                                        <input type="number" name="weight" required>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>Ingredients</label>
+                                        <input type="text" name="ingredients" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="cancel-btn">Cancel</button>
+                                <button type="submit" class="submit-btn">Add Product</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Edit Product Modal -->
+                <div class="modal" id="editProductModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Edit Product</h2>
+                            <button class="close-modal">&times;</button>
+                        </div>
+                        <form class="product-form" id="editProductForm">
+                            <!-- Same form fields as Add Product Modal -->
+                            <div class="form-actions">
+                                <button type="button" class="cancel-btn">Cancel</button>
+                                <button type="submit" class="submit-btn">Update Product</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="admin-products.js"></script>
+</body>
+</html> 

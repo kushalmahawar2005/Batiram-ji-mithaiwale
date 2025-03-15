@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers Management - Bastiramji Mithai Wale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo/bmw-logo.jpg" alt="Logo" class="logo">
+                <h2>Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="admin-orders.html" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="admin-products.html" class="nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                <a href="admin-inventory.html" class="nav-link">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventory</span>
+                </a>
+                <a href="admin-customers.html" class="nav-link active">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </a>
+                <a href="admin-analytics.html" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="admin-settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-box">
+                    <input type="text" placeholder="Search customers...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="header-right">
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="admin-profile">
+                        <img src="https://via.placeholder.com/40" alt="Admin">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="content-header">
+                    <h1>Customers Management</h1>
+                    <div class="customer-filters">
+                        <select id="customerTypeFilter">
+                            <option value="all">All Customers</option>
+                            <option value="regular">Regular Customers</option>
+                            <option value="wholesale">Wholesale Customers</option>
+                            <option value="retail">Retail Customers</option>
+                        </select>
+                        <select id="activityFilter">
+                            <option value="all">All Activity</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="customer-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Customers</h3>
+                            <p id="totalCustomers">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Active Customers</h3>
+                            <p id="activeCustomers">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Inactive Customers</h3>
+                            <p id="inactiveCustomers">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>VIP Customers</h3>
+                            <p id="vipCustomers">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="customers-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Customer ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Type</th>
+                                <th>Total Orders</th>
+                                <th>Total Spent</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Customers will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Customer Details Modal -->
+                <div class="modal" id="customerDetailsModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Customer Details</h2>
+                            <button class="close-modal">&times;</button>
+                        </div>
+                        <div class="customer-details">
+                            <div class="customer-info">
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>Customer ID:</label>
+                                        <span id="customerId"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Name:</label>
+                                        <span id="customerName"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Email:</label>
+                                        <span id="customerEmail"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Phone:</label>
+                                        <span id="customerPhone"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Type:</label>
+                                        <span id="customerType"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Status:</label>
+                                        <span id="customerStatus"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Joined Date:</label>
+                                        <span id="customerJoinedDate"></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Last Order:</label>
+                                        <span id="customerLastOrder"></span>
+                                    </div>
+                                </div>
+                                <div class="address-info">
+                                    <h3>Addresses</h3>
+                                    <div id="customerAddresses">
+                                        <!-- Addresses will be dynamically added here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="customer-orders">
+                                <h3>Recent Orders</h3>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Date</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customerOrdersTable">
+                                        <!-- Recent orders will be dynamically added here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="customer-actions">
+                                <button class="edit-customer-btn">
+                                    <i class="fas fa-edit"></i> Edit Customer
+                                </button>
+                                <button class="send-email-btn">
+                                    <i class="fas fa-envelope"></i> Send Email
+                                </button>
+                                <button class="block-customer-btn">
+                                    <i class="fas fa-ban"></i> Block Customer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Customer Modal -->
+                <div class="modal" id="editCustomerModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Edit Customer</h2>
+                            <button class="close-modal">&times;</button>
+                        </div>
+                        <div class="edit-customer-form">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="editName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="editEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" id="editPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Type</label>
+                                <select id="editType">
+                                    <option value="retail">Retail</option>
+                                    <option value="wholesale">Wholesale</option>
+                                    <option value="vip">VIP</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="editStatus">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="blocked">Blocked</option>
+                                </select>
+                            </div>
+                            <div class="form-actions">
+                                <button class="cancel-btn">Cancel</button>
+                                <button class="save-btn">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin-customers.js"></script>
+</body>
+</html> 

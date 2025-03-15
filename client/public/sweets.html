@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Sweets Collection - Bastiramji Mithai Wale</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="images/logo/bmw-logo.jpg" alt="Bastiram Ji Mithai Wale Logo" onerror="this.src='images/placeholder.jpg'">
+                <div class="logo-text">
+                    <h1>Bastiram Ji Mithai Wale</h1>
+                    <p>Since 2002</p>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="sweetSearch" placeholder="Search sweets...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#products">Our Sweets</a></li>
+                <li><a href="index.html#about">About Us</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <div class="cart-icon" onclick="toggleCart()">
+                🛒 <span class="cart-count">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Sweets Collection Section -->
+    <section class="sweets-collection">
+        <div class="container">
+            <div class="section-header">
+                <h1>Our Sweet Collection</h1>
+                <p>Discover our wide range of traditional Indian sweets</p>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <div class="filter-group">
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="milk">Milk Based</option>
+                        <option value="dry-fruits">Dry Fruits</option>
+                        <option value="bengali">Bengali Sweets</option>
+                        <option value="traditional">Traditional</option>
+                    </select>
+                    <select id="priceFilter">
+                        <option value="">Price Range</option>
+                        <option value="0-200">Under ₹200</option>
+                        <option value="200-500">₹200 - ₹500</option>
+                        <option value="500+">Above ₹500</option>
+                    </select>
+                </div>
+                <div class="view-toggle">
+                    <button class="active" data-view="grid"><i class="fas fa-th"></i></button>
+                    <button data-view="list"><i class="fas fa-list"></i></button>
+                </div>
+            </div>
+
+            <!-- Sweets Grid -->
+            <div class="sweets-grid" id="sweetsContainer">
+                <!-- Sweet cards will be dynamically added here -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="load-more">
+                <button id="loadMoreBtn">Load More</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sweet Details Modal -->
+    <div class="modal" id="sweetModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-body">
+                <!-- Content will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button class="close-cart" onclick="toggleCart()">&times;</button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be dynamically added here -->
+            </div>
+            <div class="cart-total">
+                <h3>Total: <span id="cartTotal">₹0</span></h3>
+                <button class="checkout-btn" onclick="initializeCheckout()">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Checkout</h2>
+                <button class="close-modal" onclick="closeCheckoutModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="orderSummary" class="order-summary">
+                    <!-- Order summary will be dynamically added here -->
+                </div>
+                <form id="checkoutForm" onsubmit="processCheckout(event)">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Delivery Address</label>
+                        <textarea id="address" name="address" required></textarea>
+                    </div>
+                    <button type="submit" class="checkout-btn">
+                        Place Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Bastiramji Mithai Wale</h3>
+                <p>Bringing sweetness to your life since 2002</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Bastiramji Mithai Wale. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Sweet details data
+        const sweetDetails = {
+            'kaju-katli': {
+                title: 'Kaju Katli',
+                image: 'images/signature/kaju-katli.jpg',
+                badge: 'Bestseller',
+                price: 800,
+                originalPrice: 1000,
+                discount: 20,
+                rating: '4.9/5',
+                description: 'Premium quality kaju katli made with pure cashews and cardamom.',
+                features: [
+                    { icon: 'fa-clock', text: '7 days shelf life' },
+                    { icon: 'fa-box', text: 'Premium packaging' },
+                    { icon: 'fa-award', text: 'Quality assured' },
+                    { icon: 'fa-leaf', text: 'Pure ghee based' }
+                ],
+                ingredients: 'Cashews, Sugar, Cardamom, Pure Ghee',
+                nutritionInfo: {
+                    'Calories': '245 kcal',
+                    'Total Fat': '14g',
+                    'Protein': '6g',
+                    'Carbohydrates': '28g'
+                },
+                quantity: '500g',
+                shelfLife: '7 days',
+                category: 'dry-fruits'
+            },
+            'rasmalai': {
+                title: 'Rasmalai',
+                image: 'images/signature/rasmalai.jpg',
+                badge: 'Popular',
+                price: 600,
+                rating: '4.8/5',
+                description: 'Soft cottage cheese dumplings in saffron-flavored milk.',
+                features: [
+                    { icon: 'fa-snowflake', text: 'Keep refrigerated' },
+                    { icon: 'fa-clock', text: '5 days shelf life' },
+                    { icon: 'fa-star', text: 'Premium quality' }
+                ],
+                ingredients: 'Milk, Sugar, Cardamom, Saffron, Pistachios',
+                nutritionInfo: {
+                    'Calories': '180 kcal',
+                    'Total Fat': '8g',
+                    'Protein': '5g',
+                    'Carbohydrates': '22g'
+                },
+                quantity: '6 pieces',
+                shelfLife: '5 days'
+            },
+            'gulab-jamun': {
+                title: 'Gulab Jamun',
+                image: 'images/signature/gulab-jamun.jpg',
+                badge: 'Classic',
+                price: 400,
+                rating: '4.7/5',
+                description: 'Soft, melt-in-mouth milk dough balls in aromatic sugar syrup.',
+                features: [
+                    { icon: 'fa-droplet', text: 'Soft texture' },
+                    { icon: 'fa-clock', text: '6 days shelf life' },
+                    { icon: 'fa-certificate', text: 'Traditional recipe' }
+                ],
+                ingredients: 'Milk powder, Sugar, Cardamom, Rose water',
+                nutritionInfo: {
+                    'Calories': '220 kcal',
+                    'Total Fat': '9g',
+                    'Protein': '4g',
+                    'Carbohydrates': '32g'
+                },
+                quantity: '12 pieces',
+                shelfLife: '6 days',
+                category: 'traditional'
+            },
+            'motichoor-ladoo': {
+                title: 'Motichoor Ladoo',
+                image: 'images/signature/motichoor-ladoo.jpg',
+                badge: 'Festival Special',
+                price: 600,
+                rating: '4.9/5',
+                description: 'Tiny gram flour pearls combined with ghee and sugar syrup.',
+                features: [
+                    { icon: 'fa-gem', text: 'Premium quality' },
+                    { icon: 'fa-clock', text: '8 days shelf life' },
+                    { icon: 'fa-gift', text: 'Gift packaging' }
+                ],
+                ingredients: 'Gram flour, Sugar, Ghee, Cardamom, Pistachios',
+                nutritionInfo: {
+                    'Calories': '185 kcal',
+                    'Total Fat': '8g',
+                    'Protein': '3g',
+                    'Carbohydrates': '26g'
+                },
+                quantity: '12 pieces',
+                shelfLife: '8 days',
+                category: 'traditional'
+            },
+            'rasgulla': {
+                title: 'Rasgulla',
+                image: 'images/signature/rasgulla.jpg',
+                badge: 'Bengali Special',
+                price: 450,
+                rating: '4.8/5',
+                description: 'Soft and spongy cottage cheese balls in sugar syrup.',
+                features: [
+                    { icon: 'fa-snowflake', text: 'Keep refrigerated' },
+                    { icon: 'fa-clock', text: '5 days shelf life' },
+                    { icon: 'fa-heart', text: 'Light & healthy' }
+                ],
+                ingredients: 'Cottage cheese, Sugar, Rose water',
+                nutritionInfo: {
+                    'Calories': '140 kcal',
+                    'Total Fat': '4g',
+                    'Protein': '5g',
+                    'Carbohydrates': '22g'
+                },
+                quantity: '8 pieces',
+                shelfLife: '5 days',
+                category: 'bengali'
+            },
+            'milk-cake': {
+                title: 'Milk Cake',
+                image: 'images/signature/milk-cake.jpg',
+                badge: 'Rich & Creamy',
+                price: 700,
+                rating: '4.9/5',
+                description: 'Dense and rich milk cake made with reduced milk and ghee.',
+                features: [
+                    { icon: 'fa-crown', text: 'Premium quality' },
+                    { icon: 'fa-clock', text: '10 days shelf life' },
+                    { icon: 'fa-star', text: 'Bestseller' }
+                ],
+                ingredients: 'Milk, Sugar, Ghee, Cardamom',
+                nutritionInfo: {
+                    'Calories': '290 kcal',
+                    'Total Fat': '14g',
+                    'Protein': '8g',
+                    'Carbohydrates': '35g'
+                },
+                quantity: '500g',
+                shelfLife: '10 days',
+                category: 'milk'
+            },
+            'besan-ladoo': {
+                title: 'Besan Ladoo',
+                image: 'images/signature/besan-ladoo.jpg',
+                badge: 'Traditional',
+                price: 550,
+                rating: '4.7/5',
+                description: 'Traditional gram flour ladoos with ghee and cardamom.',
+                features: [
+                    { icon: 'fa-leaf', text: 'Pure ingredients' },
+                    { icon: 'fa-clock', text: '15 days shelf life' },
+                    { icon: 'fa-award', text: 'Authentic recipe' }
+                ],
+                ingredients: 'Gram flour, Sugar, Ghee, Cardamom',
+                nutritionInfo: {
+                    'Calories': '180 kcal',
+                    'Total Fat': '9g',
+                    'Protein': '4g',
+                    'Carbohydrates': '22g'
+                },
+                quantity: '500g',
+                shelfLife: '15 days',
+                category: 'traditional'
+            },
+            'kesar-peda': {
+                title: 'Kesar Peda',
+                image: 'images/signature/kesar-peda.jpg',
+                badge: 'Premium',
+                price: 800,
+                rating: '4.9/5',
+                description: 'Rich milk peda infused with saffron and cardamom.',
+                features: [
+                    { icon: 'fa-gem', text: 'Premium quality' },
+                    { icon: 'fa-clock', text: '12 days shelf life' },
+                    { icon: 'fa-star', text: 'Signature item' }
+                ],
+                ingredients: 'Milk, Sugar, Saffron, Cardamom, Pistachios',
+                nutritionInfo: {
+                    'Calories': '210 kcal',
+                    'Total Fat': '9g',
+                    'Protein': '5g',
+                    'Carbohydrates': '28g'
+                },
+                quantity: '500g',
+                shelfLife: '12 days',
+                category: 'milk'
+            },
+            'malai-peda': {
+                title: 'Malai Peda',
+                image: 'images/signature/malai-peda.jpg',
+                badge: 'Fresh Daily',
+                price: 600,
+                rating: '4.8/5',
+                description: 'Soft and creamy milk peda with rich texture.',
+                features: [
+                    { icon: 'fa-star', text: 'Premium quality' },
+                    { icon: 'fa-clock', text: '7 days shelf life' },
+                    { icon: 'fa-leaf', text: 'Pure ingredients' }
+                ],
+                ingredients: 'Milk, Sugar, Cardamom',
+                nutritionInfo: {
+                    'Calories': '180 kcal',
+                    'Total Fat': '8g',
+                    'Protein': '4g',
+                    'Carbohydrates': '24g'
+                },
+                quantity: '500g',
+                shelfLife: '7 days',
+                category: 'milk'
+            },
+            'sandesh': {
+                title: 'Sandesh',
+                image: 'images/signature/sandesh.jpg',
+                badge: 'Bengali Special',
+                price: 700,
+                rating: '4.9/5',
+                description: 'Traditional Bengali sweet made from fresh cottage cheese.',
+                features: [
+                    { icon: 'fa-snowflake', text: 'Keep refrigerated' },
+                    { icon: 'fa-clock', text: '5 days shelf life' },
+                    { icon: 'fa-leaf', text: 'No preservatives' }
+                ],
+                ingredients: 'Cottage cheese, Sugar, Cardamom',
+                nutritionInfo: {
+                    'Calories': '160 kcal',
+                    'Total Fat': '6g',
+                    'Protein': '8g',
+                    'Carbohydrates': '20g'
+                },
+                quantity: '500g',
+                shelfLife: '5 days',
+                category: 'bengali'
+            },
+            'mysore-pak': {
+                title: 'Mysore Pak',
+                image: 'images/signature/mysore-pak.jpg',
+                badge: 'Traditional',
+                price: 550,
+                rating: '4.7/5',
+                description: 'Rich South Indian sweet made with pure ghee.',
+                features: [
+                    { icon: 'fa-star', text: 'Authentic recipe' },
+                    { icon: 'fa-clock', text: '15 days shelf life' },
+                    { icon: 'fa-award', text: 'Premium quality' }
+                ],
+                ingredients: 'Gram flour, Sugar, Pure Ghee',
+                nutritionInfo: {
+                    'Calories': '220 kcal',
+                    'Total Fat': '12g',
+                    'Protein': '4g',
+                    'Carbohydrates': '26g'
+                },
+                quantity: '500g',
+                shelfLife: '15 days',
+                category: 'traditional'
+            },
+            'dry-fruit-ladoo': {
+                title: 'Dry Fruit Ladoo',
+                image: 'images/signature/dry-fruit-ladoo.jpg',
+                badge: 'Healthy Choice',
+                price: 900,
+                rating: '4.9/5',
+                description: 'Nutritious ladoos made with premium dry fruits.',
+                features: [
+                    { icon: 'fa-heart', text: 'Healthy option' },
+                    { icon: 'fa-clock', text: '30 days shelf life' },
+                    { icon: 'fa-leaf', text: 'No added sugar' }
+                ],
+                ingredients: 'Dates, Almonds, Cashews, Pistachios, Figs',
+                nutritionInfo: {
+                    'Calories': '180 kcal',
+                    'Total Fat': '10g',
+                    'Protein': '5g',
+                    'Carbohydrates': '22g'
+                },
+                quantity: '500g',
+                shelfLife: '30 days',
+                category: 'dry-fruits'
+            },
+            'kalakand': {
+                title: 'Kalakand',
+                image: 'images/signature/kalakand.jpg',
+                badge: 'Fresh Daily',
+                price: 750,
+                rating: '4.8/5',
+                description: 'Rich milk cake made with reduced milk and cardamom.',
+                features: [
+                    { icon: 'fa-snowflake', text: 'Keep refrigerated' },
+                    { icon: 'fa-clock', text: '5 days shelf life' },
+                    { icon: 'fa-leaf', text: 'Pure milk' }
+                ],
+                ingredients: 'Milk, Sugar, Cardamom',
+                nutritionInfo: {
+                    'Calories': '200 kcal',
+                    'Total Fat': '9g',
+                    'Protein': '6g',
+                    'Carbohydrates': '25g'
+                },
+                quantity: '500g',
+                shelfLife: '5 days',
+                category: 'milk'
+            },
+            'badam-pista-roll': {
+                title: 'Badam Pista Roll',
+                image: 'images/signature/badam-pista-roll.jpg',
+                badge: 'Premium',
+                price: 950,
+                rating: '4.9/5',
+                description: 'Luxurious roll made with almonds and pistachios.',
+                features: [
+                    { icon: 'fa-gem', text: 'Premium quality' },
+                    { icon: 'fa-clock', text: '20 days shelf life' },
+                    { icon: 'fa-award', text: 'Best seller' }
+                ],
+                ingredients: 'Almonds, Pistachios, Sugar, Cardamom',
+                nutritionInfo: {
+                    'Calories': '230 kcal',
+                    'Total Fat': '14g',
+                    'Protein': '7g',
+                    'Carbohydrates': '23g'
+                },
+                quantity: '500g',
+                shelfLife: '20 days',
+                category: 'dry-fruits'
+            },
+            'cham-cham': {
+                title: 'Cham Cham',
+                image: 'images/signature/cham-cham.jpg',
+                badge: 'Bengali Special',
+                price: 600,
+                rating: '4.7/5',
+                description: 'Soft Bengali sweet topped with coconut flakes.',
+                features: [
+                    { icon: 'fa-snowflake', text: 'Keep refrigerated' },
+                    { icon: 'fa-clock', text: '4 days shelf life' },
+                    { icon: 'fa-star', text: 'Special recipe' }
+                ],
+                ingredients: 'Milk, Sugar, Coconut, Food color',
+                nutritionInfo: {
+                    'Calories': '170 kcal',
+                    'Total Fat': '7g',
+                    'Protein': '4g',
+                    'Carbohydrates': '24g'
+                },
+                quantity: '500g',
+                shelfLife: '4 days',
+                category: 'bengali'
+            },
+            'khoya-burfi': {
+                title: 'Khoya Burfi',
+                image: 'images/signature/khoya-burfi.jpg',
+                badge: 'Classic',
+                price: 700,
+                rating: '4.8/5',
+                description: 'Traditional Indian sweet made with reduced milk solids.',
+                features: [
+                    { icon: 'fa-star', text: 'Classic recipe' },
+                    { icon: 'fa-clock', text: '10 days shelf life' },
+                    { icon: 'fa-award', text: 'Pure ingredients' }
+                ],
+                ingredients: 'Khoya, Sugar, Cardamom',
+                nutritionInfo: {
+                    'Calories': '210 kcal',
+                    'Total Fat': '11g',
+                    'Protein': '5g',
+                    'Carbohydrates': '26g'
+                },
+                quantity: '500g',
+                shelfLife: '10 days',
+                category: 'traditional'
+            },
+            'rabri': {
+                title: 'Rabri',
+                image: 'images/signature/rabri.jpg',
+                badge: 'Creamy Delight',
+                price: 650,
+                rating: '4.9/5',
+                description: 'Thick, creamy dessert made with layers of reduced milk.',
+                features: [
+                    { icon: 'fa-snowflake', text: 'Keep refrigerated' },
+                    { icon: 'fa-clock', text: '3 days shelf life' },
+                    { icon: 'fa-leaf', text: 'No preservatives' }
+                ],
+                ingredients: 'Milk, Sugar, Nuts, Cardamom',
+                nutritionInfo: {
+                    'Calories': '225 kcal',
+                    'Total Fat': '12g',
+                    'Protein': '6g',
+                    'Carbohydrates': '27g'
+                },
+                quantity: '500g',
+                shelfLife: '3 days',
+                category: 'milk'
+            },
+            'raj-bhog': {
+                title: 'Raj Bhog',
+                image: 'images/signature/raj-bhog.jpg',
+                badge: 'Royal Delight',
+                price: 750,
+                rating: '4.8/5',
+                description: 'Large stuffed rasgulla with saffron and nuts.',
+                features: [
+                    { icon: 'fa-crown', text: 'Royal recipe' },
+                    { icon: 'fa-clock', text: '4 days shelf life' },
+                    { icon: 'fa-star', text: 'Premium quality' }
+                ],
+                ingredients: 'Cottage cheese, Sugar, Saffron, Nuts',
+                nutritionInfo: {
+                    'Calories': '190 kcal',
+                    'Total Fat': '8g',
+                    'Protein': '5g',
+                    'Carbohydrates': '26g'
+                },
+                quantity: '6 pieces',
+                shelfLife: '4 days',
+                category: 'bengali'
+            },
+            'anjeer-roll': {
+                title: 'Anjeer Roll',
+                image: 'images/signature/anjeer-roll.jpg',
+                badge: 'Healthy Choice',
+                price: 850,
+                rating: '4.7/5',
+                description: 'Premium fig rolls with mixed dry fruits.',
+                features: [
+                    { icon: 'fa-heart', text: 'Healthy option' },
+                    { icon: 'fa-clock', text: '25 days shelf life' },
+                    { icon: 'fa-leaf', text: 'Natural sweetness' }
+                ],
+                ingredients: 'Figs, Dates, Mixed Nuts, Honey',
+                nutritionInfo: {
+                    'Calories': '175 kcal',
+                    'Total Fat': '8g',
+                    'Protein': '4g',
+                    'Carbohydrates': '25g'
+                },
+                quantity: '500g',
+                shelfLife: '25 days',
+                category: 'dry-fruits'
+            },
+            'gajar-halwa': {
+                title: 'Gajar Halwa',
+                image: 'images/signature/gajar-halwa.jpg',
+                badge: 'Winter Special',
+                price: 600,
+                rating: '4.9/5',
+                description: 'Traditional carrot pudding made with pure ghee.',
+                features: [
+                    { icon: 'fa-snowflake', text: 'Keep refrigerated' },
+                    { icon: 'fa-clock', text: '7 days shelf life' },
+                    { icon: 'fa-award', text: 'Seasonal special' }
+                ],
+                ingredients: 'Carrots, Milk, Sugar, Ghee, Nuts',
+                nutritionInfo: {
+                    'Calories': '220 kcal',
+                    'Total Fat': '10g',
+                    'Protein': '4g',
+                    'Carbohydrates': '30g'
+                },
+                quantity: '500g',
+                shelfLife: '7 days',
+                category: 'traditional'
+            },
+            'rasmalai-cake': {
+                title: 'Rasmalai Cake',
+                image: 'images/signature/rasmalai-cake.jpg',
+                badge: 'Fusion Special',
+                price: 850,
+                rating: '4.9/5',
+                description: 'Innovative fusion of rasmalai in cake form.',
+                features: [
+                    { icon: 'fa-snowflake', text: 'Keep refrigerated' },
+                    { icon: 'fa-clock', text: '3 days shelf life' },
+                    { icon: 'fa-star', text: 'Chef special' }
+                ],
+                ingredients: 'Milk, Cream, Sugar, Cardamom, Saffron',
+                nutritionInfo: {
+                    'Calories': '240 kcal',
+                    'Total Fat': '12g',
+                    'Protein': '6g',
+                    'Carbohydrates': '28g'
+                },
+                quantity: '500g',
+                shelfLife: '3 days',
+                category: 'milk'
+            }
+        };
+
+        // Function to create sweet card
+        function createSweetCard(sweetId, sweetData) {
+            return `
+                <div class="sweet-card" data-type="sweet" data-id="${sweetId}">
+                    <div class="sweet-image">
+                        <img src="${sweetData.image}" alt="${sweetData.title}">
+                        ${sweetData.badge ? `<div class="sweet-badge">${sweetData.badge}</div>` : ''}
+                    </div>
+                    <div class="sweet-content">
+                        <h3>${sweetData.title}</h3>
+                        <p>${sweetData.description}</p>
+                        <div class="sweet-details">
+                            <span><i class="fas fa-clock"></i> ${sweetData.shelfLife}</span>
+                            <span><i class="fas fa-star"></i> ${sweetData.rating}</span>
+                        </div>
+                        <div class="sweet-price">₹${sweetData.price}</div>
+                        <div class="button-group">
+                            <button class="view-details-btn" onclick="showSweetDetails('${sweetId}')">View Details</button>
+                            <button class="add-cart-btn" onclick="addToCart('${sweetId}')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to show sweet details
+        function showSweetDetails(sweetId) {
+            const sweet = sweetDetails[sweetId];
+            if (!sweet) {
+                console.error('Sweet not found:', sweetId);
+                return;
+            }
+
+            const modal = document.getElementById('sweetModal');
+            const modalBody = modal.querySelector('.modal-body');
+
+            const modalContent = `
+                <div class="sweet-details-content">
+                    <div class="sweet-image-large">
+                        <img src="${sweet.image}" alt="${sweet.title}" onerror="this.src='images/placeholder.jpg'">
+                        ${sweet.badge ? `<span class="sweet-badge">${sweet.badge}</span>` : ''}
+                    </div>
+                    <div class="sweet-info">
+                        <h2>${sweet.title}</h2>
+                        <div class="sweet-price-details">
+                            <div class="price-info">
+                                <span class="price">₹${sweet.price}</span>
+                                ${sweet.originalPrice ? `
+                                    <span class="original-price">₹${sweet.originalPrice}</span>
+                                    <span class="discount">${sweet.discount}% OFF</span>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <p class="description">${sweet.description}</p>
+                        
+                        <div class="sweet-features">
+                            ${sweet.features.map(feature => `
+                                <div class="feature">
+                                    <i class="fas ${feature.icon}"></i>
+                                    <span>${feature.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="details-section">
+                            <h3>Product Details</h3>
+                            <ul>
+                                <li><i class="fas fa-box"></i> Quantity: ${sweet.quantity}</li>
+                                <li><i class="fas fa-clock"></i> Shelf Life: ${sweet.shelfLife}</li>
+                                <li><i class="fas fa-star"></i> Rating: ${sweet.rating}</li>
+                            </ul>
+                        </div>
+
+                        <div class="details-section">
+                            <h3>Ingredients</h3>
+                            <p>${sweet.ingredients}</p>
+                        </div>
+
+                        <div class="details-section">
+                            <h3>Nutritional Information</h3>
+                            <ul>
+                                ${Object.entries(sweet.nutritionInfo).map(([key, value]) => `
+                                    <li><strong>${key}:</strong> ${value}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="quantity-selector">
+                            <label>Quantity:</label>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
+                                <input type="number" id="sweetQuantity" value="1" min="1" max="20">
+                                <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
+                            </div>
+                        </div>
+
+                        <button class="add-to-cart-btn" onclick="addToCart('${sweetId}', true)">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modalBody.innerHTML = modalContent;
+            modal.classList.add('active');
+
+            // Close modal functionality
+            const closeBtn = modal.querySelector('.close-modal');
+            closeBtn.onclick = function() {
+                modal.classList.remove('active');
+            };
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.classList.remove('active');
+                }
+            };
+        }
+
+        // Function to update quantity
+        function updateQuantity(change) {
+            const input = document.getElementById('sweetQuantity');
+            let value = parseInt(input.value) + change;
+            value = Math.max(1, Math.min(20, value)); // Clamp between 1 and 20
+            input.value = value;
+        }
+
+        // Initialize sweets page
+        document.addEventListener('DOMContentLoaded', function() {
+            const sweetsContainer = document.getElementById('sweetsContainer');
+            
+            // Add initial sweet cards
+            Object.entries(sweetDetails).forEach(([sweetId, sweetData]) => {
+                sweetsContainer.innerHTML += createSweetCard(sweetId, sweetData);
+            });
+
+            // Initialize view toggle
+            const viewToggleButtons = document.querySelectorAll('.view-toggle button');
+            viewToggleButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    viewToggleButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    sweetsContainer.className = `sweets-grid ${button.dataset.view}-view`;
+                });
+            });
+
+            // Initialize filters
+            const categoryFilter = document.getElementById('categoryFilter');
+            const priceFilter = document.getElementById('priceFilter');
+
+            [categoryFilter, priceFilter].forEach(filter => {
+                filter.addEventListener('change', filterSweets);
+            });
+        });
+
+        // Filter sweets function
+        function filterSweets() {
+            const category = document.getElementById('categoryFilter').value;
+            const priceRange = document.getElementById('priceFilter').value;
+            const sweetsContainer = document.getElementById('sweetsContainer');
+
+            // Clear container
+            sweetsContainer.innerHTML = '';
+
+            // Filter and add sweet cards
+            Object.entries(sweetDetails).forEach(([sweetId, sweetData]) => {
+                let showCard = true;
+
+                // Apply category filter
+                if (category && sweetData.category !== category) {
+                    showCard = false;
+                }
+
+                // Apply price filter
+                if (priceRange) {
+                    const price = sweetData.price;
+                    const [min, max] = priceRange.split('-').map(Number);
+                    if (max) {
+                        if (price < min || price > max) showCard = false;
+                    } else {
+                        if (price <= min) showCard = false;
+                    }
+                }
+
+                if (showCard) {
+                    sweetsContainer.innerHTML += createSweetCard(sweetId, sweetData);
+                }
+            });
+        }
+
+        // Cart functionality
+        let cart = [];
+
+        function addToCart(sweetId, fromModal = false) {
+            const sweet = sweetDetails[sweetId];
+            if (!sweet) return;
+
+            const quantity = parseInt(document.getElementById('sweetQuantity')?.value || 1);
+            
+            const existingItem = cart.find(item => item.id === sweetId);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: sweetId,
+                    title: sweet.title,
+                    price: sweet.price,
+                    quantity: quantity,
+                    image: sweet.image
+                });
+            }
+
+            updateCartDisplay();
+            
+            // Close modal if open and if adding from modal
+            if (fromModal) {
+                const modal = document.getElementById('sweetModal');
+                modal.classList.remove('active');
+            }
+
+            // Show success notification
+            showNotification('Added to cart successfully!', 'success');
+        }
+
+        function updateCartDisplay() {
+            const cartCount = document.querySelector('.cart-count');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            // Update cart count
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+
+            // Update cart items
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.title}">
+                    <div class="cart-item-details">
+                        <h4 class="cart-item-title">${item.title}</h4>
+                        <div class="cart-item-price">₹${item.price}</div>
+                        <div class="cart-item-quantity">
+                            <button onclick="updateCartItemQuantity('${item.id}', -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="updateCartItemQuantity('${item.id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <button class="remove-item" onclick="removeFromCart('${item.id}')">×</button>
+                </div>
+            `).join('');
+
+            // Update total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `₹${total}`;
+        }
+
+        function updateCartItemQuantity(itemId, change) {
+            const item = cart.find(item => item.id === itemId);
+            if (item) {
+                item.quantity = Math.max(1, item.quantity + change);
+                updateCartDisplay();
+            }
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCartDisplay();
+            showNotification('Item removed from cart', 'info');
+        }
+
+        function toggleCart() {
+            const cartModal = document.getElementById('cartModal');
+            cartModal.classList.toggle('active');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+
+        // Update the checkout modal styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .checkout-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+            .checkout-modal .modal-content {
+                background-color: white;
+                margin: 5% auto;
+                padding: 20px;
+                width: 80%;
+                max-width: 600px;
+                border-radius: 8px;
+                position: relative;
+            }
+            .checkout-modal.active {
+                display: block;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Update the initializeCheckout function
+        function initializeCheckout() {
+            if (cart.length === 0) {
+                showNotification('Your cart is empty!', 'error');
+                return;
+            }
+
+            // Store cart data in localStorage for the payment page
+            localStorage.setItem('cartData', JSON.stringify({
+                items: cart,
+                total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+            }));
+
+            // Redirect to payment page
+            window.location.href = 'payment.html';
+        }
+
+        function closeCheckoutModal() {
+            const checkoutModal = document.getElementById('checkoutModal');
+            checkoutModal.classList.remove('active');
+        }
+
+        function processCheckout(event) {
+            event.preventDefault();
+            
+            // Here you would typically send the order to a server
+            // For now, we'll just show a success message and clear the cart
+            showNotification('Order placed successfully!', 'success');
+            cart = [];
+            updateCartDisplay();
+            closeCheckoutModal();
+        }
+
+        // Update the modal styles
+        const modalStyle = document.createElement('style');
+        modalStyle.textContent = `
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+            .modal.active {
+                display: block;
+            }
+            .modal .modal-content {
+                background-color: white;
+                margin: 5% auto;
+                padding: 20px;
+                width: 90%;
+                max-width: 1000px;
+                border-radius: 8px;
+                position: relative;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+        `;
+        document.head.appendChild(modalStyle);
+    </script>
+</body>
+</html> 
