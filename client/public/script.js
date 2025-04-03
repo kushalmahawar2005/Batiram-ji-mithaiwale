@@ -1539,21 +1539,21 @@ function animateChildElements(section) {
 const testimonials = [
     {
         text: "The best sweets in town! The quality and taste are consistently amazing.",
-        author: "Rahul Sharma",
+        author: "Nishtha Singh",
         role: "Regular Customer",
-        image: "https://via.placeholder.com/50"
+        image: "images/costomers/nishtha.jpg"
     },
     {
         text: "Their festival special boxes are perfect for gifting. Always fresh and beautifully packed.",
-        author: "Priya Patel",
+        author: "Vasudev Joshi",
         role: "Festival Customer",
-        image: "https://via.placeholder.com/50"
+        image: "images/costomers/vasu.jpg"
     },
     {
         text: "The traditional sweets taste exactly like my grandmother used to make. Authentic and delicious!",
-        author: "Amit Kumar",
+        author: "Akshat Rathore",
         role: "Traditional Sweet Lover",
-        image: "https://via.placeholder.com/50"
+        image: "images/costomers/akshat.jpg"
     }
 ];
 
@@ -1940,14 +1940,14 @@ function handleTimelineAnimation() {
 // Get directions function
 function getDirections(branch) {
     const addresses = {
-        main: "123 Sweet Street, Old Market Area, City Center",
-        new: "456 Modern Mall, New Market Area, City Center"
+        main: "27 Mill Chorya, Beawer Road City Center, India",
+        new: " BMW, Sabji mandi road, Tikam choraha, Gulabpura(Rajasthan)."
     };
     
     const address = addresses[branch];
     if (address) {
         const encodedAddress = encodeURIComponent(address);
-        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+        const mapsUrl = `https://maps.app.goo.gl/BGkQYHmVhPumq2xj6`;
         window.open(mapsUrl, '_blank');
     } else {
         showNotification('Location information not available');

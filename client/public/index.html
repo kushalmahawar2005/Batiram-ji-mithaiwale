@@ -33,8 +33,8 @@
             </div>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
-                <li><a href="#products">Our Sweets</a></li>
-                <li><a href="#about">About Us</a></li>
+                <li><a href="sweets.html">Our Sweets</a></li>
+                <li><a href="#owners-section">About Us</a></li>
                 <li><a href="#locations">Locations</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
@@ -57,83 +57,6 @@
             <div class="cart-total">
                 <h3>Total: <span id="cartTotal">₹0</span></h3>
                 <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Payment Modal -->
-    <div class="payment-modal" id="paymentModal">
-        <div class="payment-content">
-            <div class="payment-header">
-                <h2>Payment Details</h2>
-                <button class="close-payment" onclick="togglePayment()">&times;</button>
-            </div>
-            <div class="payment-body">
-                <div class="payment-summary">
-                    <h3>Order Summary</h3>
-                    <div class="summary-items">
-                        <!-- Summary items will be dynamically added here -->
-                    </div>
-                    <div class="summary-total">
-                        <span>Total Amount:</span>
-                        <span id="paymentTotal">₹0</span>
-                    </div>
-                </div>
-                <div class="payment-methods">
-                    <h3>Select Payment Method</h3>
-                    <div class="payment-options">
-                        <div class="payment-option" onclick="selectPaymentMethod('card')">
-                            <i class="fas fa-credit-card"></i>
-                            <span>Credit/Debit Card</span>
-                        </div>
-                        <div class="payment-option" onclick="selectPaymentMethod('upi')">
-                            <i class="fas fa-mobile-alt"></i>
-                            <span>UPI</span>
-                        </div>
-                        <div class="payment-option" onclick="selectPaymentMethod('cod')">
-                            <i class="fas fa-money-bill-wave"></i>
-                            <span>Cash on Delivery</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="payment-details" id="cardPaymentForm">
-                    <h3>Card Details</h3>
-                    <form id="cardForm">
-                        <div class="form-group">
-                            <label>Card Number</label>
-                            <input type="text" placeholder="1234 5678 9012 3456" required>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Expiry Date</label>
-                                <input type="text" placeholder="MM/YY" required>
-                            </div>
-                            <div class="form-group">
-                                <label>CVV</label>
-                                <input type="text" placeholder="123" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Name on Card</label>
-                            <input type="text" required>
-                        </div>
-                        <button type="submit" class="pay-button">
-                            <i class="fas fa-lock"></i> Pay Now
-                        </button>
-                    </form>
-                </div>
-                <div class="payment-details" id="upiPaymentForm" style="display: none;">
-                    <h3>UPI Payment</h3>
-                    <form id="upiForm">
-                        <div class="form-group">
-                            <label>UPI ID</label>
-                            <input type="text" placeholder="username@upi" required>
-                        </div>
-                        <button type="submit" class="pay-button">
-                            <i class="fas fa-mobile-alt"></i> Pay with UPI
-                        </button>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
@@ -339,7 +262,7 @@
                 
                 <div class="owner-card" data-aos="fade-up" data-aos-delay="200">
                     <div class="owner-image">
-                        <img src="images/owners/kamkesh-mahawar.jpg" 
+                        <img src="images/owners/kamlesh-mahawar.jpg" 
                              alt="Shri Kamkesh Mahawar" 
                              onerror="this.src='images/placeholder-owner.jpg'">
                     </div>
@@ -396,7 +319,7 @@
             <div class="namkeen-grid">
                 <div class="namkeen-card" data-type="namkeen" data-id="aloo-bhujia" data-aos="fade-up" data-aos-delay="100">
                     <div class="namkeen-image">
-                        <img src="images/namkeen/aloo-bhujia.jpg" alt="Aloo Bhujia" onerror="this.src='https://via.placeholder.com/300x200?text=Aloo+Bhujia'">
+                        <img src="images/namkeen/alu_bhojia.jpeg" alt="Aloo Bhujia" onerror="this.src='https://via.placeholder.com/300x200?text=Aloo+Bhujia'">
                         <span class="namkeen-badge">Spicy</span>
                     </div>
                     <div class="namkeen-content">
@@ -414,7 +337,7 @@
 
                 <div class="namkeen-card" data-type="namkeen" data-id="dal-moth" data-aos="fade-up" data-aos-delay="200">
                     <div class="namkeen-image">
-                        <img src="images/namkeen/dal-moth.jpg" alt="Dal Moth" onerror="this.src='https://via.placeholder.com/300x200?text=Dal+Moth'">
+                        <img src="images/namkeen/dal_mot.jpg" alt="Dal Moth" onerror="this.src='https://via.placeholder.com/300x200?text=Dal+Moth'">
                         <span class="namkeen-badge">Bestseller</span>
                     </div>
                     <div class="namkeen-content">
@@ -432,7 +355,7 @@
 
                 <div class="namkeen-card" data-type="namkeen" data-id="khatta-meetha" data-aos="fade-up" data-aos-delay="300">
                     <div class="namkeen-image">
-                        <img src="images/namkeen/khatta-meetha.jpg" alt="Khatta Meetha" onerror="this.src='https://via.placeholder.com/300x200?text=Khatta+Meetha'">
+                        <img src="images/namkeen/khata_meetha.jpg" alt="Khatta Meetha" onerror="this.src='https://via.placeholder.com/300x200?text=Khatta+Meetha'">
                         <span class="namkeen-badge">Popular</span>
                     </div>
                     <div class="namkeen-content">
@@ -450,7 +373,7 @@
 
                 <div class="namkeen-card" data-type="namkeen" data-id="masala-mathri" data-aos="fade-up" data-aos-delay="400">
                     <div class="namkeen-image">
-                        <img src="images/namkeen/masala-mathri.jpg" alt="Masala Mathri" onerror="this.src='https://via.placeholder.com/300x200?text=Masala+Mathri'">
+                        <img src="images/namkeen/masala_mathri.jpeg" alt="Masala Mathri" onerror="this.src='https://via.placeholder.com/300x200?text=Masala+Mathri'">
                         <span class="namkeen-badge">Traditional</span>
                     </div>
                     <div class="namkeen-content">
@@ -622,39 +545,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Sweet Details Modal -->
-    <div class="modal" id="sweetModal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('sweetModal')">&times;</span>
-            <div class="modal-body">
-                <!-- Content will be dynamically added here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Featured Products Section -->
-    <section id="products" class="products">
-        <h2>Our Signature Sweets</h2>
-        <p class="products-subtitle">Handcrafted with love, perfected over generations</p>
-        <div class="filter-section">
-            <select id="categoryFilter">
-                <option value="all">All Categories</option>
-                <option value="traditional">Traditional</option>
-                <option value="festival">Festival Special</option>
-                <option value="gift">Gift Boxes</option>
-            </select>
-            <select id="priceFilter">
-                <option value="all">All Prices</option>
-                <option value="low">Under ₹200</option>
-                <option value="medium">₹200 - ₹400</option>
-                <option value="high">Above ₹400</option>
-            </select>
-        </div>
-        <div class="product-grid">
-            <!-- Product cards will be dynamically added here -->
-        </div>
-    </section>
 
      <!-- Heritage Section -->
      <section class="heritage-section">
@@ -919,11 +809,11 @@
             <div class="location-card">
                 <h3>Main Branch</h3>
                 <p>Established in 2002</p>
-                <p><i class="fas fa-map-marker-alt"></i> 123 Sweet Street, Old Market Area, City Center</p>
+                <p><i class="fas fa-map-marker-alt"></i> 27 Mill Chorya, Beawer Road City Center, India</p>
                 <div class="location-hours">
                     <h4>Opening Hours</h4>
                     <p><i class="fas fa-clock"></i> Monday - Sunday: 8:00 AM - 10:00 PM</p>
-                    <p><i class="fas fa-phone"></i> +91 1234567890</p>
+                    <p><i class="fas fa-phone"></i> +91 9950925725</p>
                 </div>
                 <button class="directions-btn" onclick="getDirections('main')">
                     <i class="fas fa-directions"></i> Get Directions
@@ -932,11 +822,11 @@
             <div class="location-card">
                 <h3>New Branch</h3>
                 <p>Recently Opened</p>
-                <p><i class="fas fa-map-marker-alt"></i> 456 Modern Mall, New Market Area, City Center</p>
+                <p><i class="fas fa-map-marker-alt"></i>  BMW, Sabji mandi road, Tikam choraha, Gulabpura(Rajasthan).</p>
                 <div class="location-hours">
                     <h4>Opening Hours</h4>
                     <p><i class="fas fa-clock"></i> Monday - Sunday: 9:00 AM - 11:00 PM</p>
-                    <p><i class="fas fa-phone"></i> +91 9876543210</p>
+                    <p><i class="fas fa-phone"></i> +91 9413675495</p>
                 </div>
                 <button class="directions-btn" onclick="getDirections('new')">
                     <i class="fas fa-directions"></i> Get Directions
@@ -954,14 +844,15 @@
                 <div class="info-card">
                     <i class="fas fa-map-marker-alt"></i>
                     <h3>Visit Us</h3>
-                    <p>123 Sweet Street, Old Market Area</p>
+                    <p>27 Mill Chorya, Beawer Road</p>
                     <p>City Center, India</p>
                 </div>
                 <div class="info-card">
                     <i class="fas fa-phone"></i>
                     <h3>Call Us</h3>
-                    <p>+91 1234567890</p>
-                    <p>+91 9876543210</p>
+                    <p>+91 9413675495</p>
+                    <p>+91 9468697095</p>
+                    <p>+91 9950925725</p>
                 </div>
                 <div class="info-card">
                     <i class="fas fa-envelope"></i>
@@ -1025,9 +916,9 @@
                     <i class="fas fa-quote-left"></i>
                     <p>"The best sweets in town! The quality and taste are consistently amazing."</p>
                     <div class="testimonial-author">
-                        <img src="https://via.placeholder.com/50" alt="Customer">
+                        <img src="images/costomers/nishtha.jpg" alt="Customer">
                         <div>
-                            <h4>Rahul Sharma</h4>
+                            <h4>Nishtha Singh</h4>
                             <p>Regular Customer</p>
                         </div>
                     </div>
