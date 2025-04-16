@@ -146,6 +146,7 @@ let filteredSweets = [];
 // Initialize sweets page
 function initSweetsPage() {
     loadAllSweets();
+    loadAdminProducts(); // Add this line
     initializeFilters();
     initializeViewToggle();
     initializeSearch();
@@ -192,11 +193,9 @@ async function loadAllSweets() {
 // Display sweets in grid/list
 function displaySweets() {
     const sweetsGrid = document.getElementById('sweetsGrid');
-    const start = (currentPage - 1) * sweetsPerPage;
-    const end = start + sweetsPerPage;
-    const sweetsToShow = filteredSweets.slice(start, end);
+    if (!sweetsGrid) return;
 
-    sweetsGrid.innerHTML = sweetsToShow.map(sweet => `
+    sweetsGrid.innerHTML = filteredSweets.map(sweet => `
         <div class="sweet-card" data-aos="fade-up">
             <div class="sweet-image">
                 <img src="${sweet.image}" alt="${sweet.name}" onerror="this.src='images/placeholder.jpg'">
@@ -220,8 +219,6 @@ function displaySweets() {
             </div>
         </div>
     `).join('');
-
-    updateLoadMoreButton();
 }
 
 // Initialize filters
@@ -2549,3 +2546,39 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ... existing code ...
+
+// Function to load admin products
+function loadAdminProducts() {
+    try {
+        const adminProducts = JSON.parse(localStorage.getItem('products')) || [];
+        console.log('Loading admin products:', adminProducts); // Debug log
+        
+        // Add admin products to allSweets array
+        adminProducts.forEach(product => {
+            const sweetCard = {
+                id: product.id,
+                name: product.name,
+                description: product.description || "Delicious traditional sweet",
+                price: product.price,
+                weight: "500g",
+                category: product.category,
+                image: product.image || "images/products/default.jpg",
+                badge: "New",
+                rating: 4.5
+            };
+            
+            // Add to allSweets if not already present
+            if (!allSweets.find(sweet => sweet.id === product.id)) {
+                allSweets.push(sweetCard);
+                console.log('Added product:', sweetCard); // Debug log
+            }
+        });
+        
+        // Update filtered sweets and display
+        filteredSweets = [...allSweets];
+        console.log('Updated allSweets:', allSweets); // Debug log
+        displaySweets();
+    } catch (error) {
+        console.error('Error loading admin products:', error);
+    }
+}

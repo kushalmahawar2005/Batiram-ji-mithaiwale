@@ -63,55 +63,65 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="hero-slider">
-            <div class="slide active">
-                <img src="images/hero/slide1.jpg" alt="Traditional Indian Sweets">
-                <div class="slide-content">
-                    <div class="section-header">
-                        <h1>Welcome to Bastiramji Mithai Wale</h1>
-                        <p>Experience the authentic taste of traditional Indian sweets</p>
-                    </div>
-                    <div class="hero-buttons">
-                        <a href="#products" class="cta-button">Explore Our Sweets</a>
-                        <a href="#special-offers" class="cta-button secondary">View Special Offers</a>
-                    </div>
-                </div>
-            </div>
-            <div class="slide">
-                <img src="images/hero/slide2.jpg" alt="Festival Special Sweets">
-                <div class="slide-content">
-                    <div class="section-header">
-                        <h1>Festival Special Collection</h1>
-                        <p>Celebrate with our premium selection of festive sweets</p>
-                    </div>
-                    <div class="hero-buttons">
-                        <a href="#festival-special" class="cta-button">View Collection</a>
-                    </div>
-                </div>
-            </div>
-            <div class="slide">
-                <img src="images/hero/slide3.jpg" alt="Wedding Collection">
-                <div class="slide-content">
-                    <div class="section-header">
-                        <h1>Wedding & Special Occasions</h1>
-                        <p>Make your celebrations sweeter with our exclusive collections</p>
-                    </div>
-                    <div class="hero-buttons">
-                        <a href="#sweet-boxes" class="cta-button">View Packages</a>
-                    </div>
-                </div>
-            </div>
+        <!-- Video Background -->
+        <div class="video-background">
+            <video autoplay muted loop playsinline>
+                <source src="videos/hero-background.mp4" type="video/mp4">
+                <source src="videos/hero-background.webm" type="video/webm">
+                <!-- Fallback image if video doesn't load -->
+                <img src="images/hero/fallback.jpg" alt="Traditional Indian Sweets">
+            </video>
+            <div class="video-overlay"></div>
         </div>
-        <button class="slider-nav prev">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="slider-nav next">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-        <div class="slider-dots">
-            <span class="dot active"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
+
+        <div class="hero-content" data-parallax="scroll" data-image-src="images/hero/parallax-bg.jpg">
+            <div class="hero-slider">
+                <div class="slide active">
+                    <div class="slide-content">
+                        <div class="section-header">
+                            <h1 class="floating">Welcome to Bastiramji Mithai Wale</h1>
+                            <p class="floating">Experience the authentic taste of traditional Indian sweets</p>
+                        </div>
+                        <div class="hero-buttons">
+                            <a href="#products" class="cta-button floating">Explore Our Sweets</a>
+                            <a href="#special-offers" class="cta-button secondary floating">View Special Offers</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide">
+                    <div class="slide-content">
+                        <div class="section-header">
+                            <h1 class="floating">Festival Special Collection</h1>
+                            <p class="floating">Celebrate with our premium selection of festive sweets</p>
+                        </div>
+                        <div class="hero-buttons">
+                            <a href="#festival-special" class="cta-button floating">View Collection</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide">
+                    <div class="slide-content">
+                        <div class="section-header">
+                            <h1 class="floating">Wedding & Special Occasions</h1>
+                            <p class="floating">Make your celebrations sweeter with our exclusive collections</p>
+                        </div>
+                        <div class="hero-buttons">
+                            <a href="#sweet-boxes" class="cta-button floating">View Packages</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="slider-nav prev">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-nav next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <div class="slider-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
         </div>
     </section>
 
@@ -991,6 +1001,12 @@
             </div>
         </div>
     </div>
+
+    <!-- WhatsApp Chat Button -->
+    <a href="https://wa.me/919950925725" class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-whatsapp"></i>
+        <span class="whatsapp-tooltip">Chat with us!</span>
+    </a>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="script.js"></script>

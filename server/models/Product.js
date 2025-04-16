@@ -6,42 +6,37 @@ const productSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    category: {
-        type: String,
-        required: true,
-        enum: ['sweets', 'namkeen', 'gift-boxes', 'festival-special']
-    },
-    price: {
-        type: Number,
-        required: true,
-        min: 0
-    },
-    stock: {
-        type: Number,
-        required: true,
-        min: 0
-    },
     description: {
         type: String,
         required: true
     },
-    image: {
-        type: String,
+    price: {
+        type: Number,
         required: true
     },
-    shelfLife: {
-        type: Number,
+    category: {
+        type: String,
         required: true,
-        min: 0
+        enum: ['sweets', 'namkeen', 'signature']
     },
-    weight: {
-        type: Number,
-        required: true,
-        min: 0
-    },
-    ingredients: {
+    images: [{
         type: String,
         required: true
+    }],
+    stock: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    lowStockAlert: {
+        type: Number,
+        required: true,
+        default: 10
+    },
+    status: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'active'
     },
     createdAt: {
         type: Date,

@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
         const products = await Product.find();
         res.json(products);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
@@ -53,45 +53,49 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create new product (admin only)
+// Create product (protected route)
 router.post('/', authenticateAdmin, upload.single('image'), async (req, res) => {
     try {
+        const { name, category, price, stock, description, shelfLife, weight, ingredients } = req.body;
+
         const product = new Product({
-            name: req.body.name,
-            category: req.body.category,
-            price: req.body.price,
-            stock: req.body.stock,
-            description: req.body.description,
+            name,
+            category,
+            price,
+            stock,
+            description,
             image: `/images/products/${req.file.filename}`,
-            shelfLife: req.body.shelfLife,
-            weight: req.body.weight,
-            ingredients: req.body.ingredients
+            shelfLife,
+            weight,
+            ingredients
         });
 
         const newProduct = await product.save();
         res.status(201).json(newProduct);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Update product (admin only)
+// Update product (protected route)
 router.put('/:id', authenticateAdmin, upload.single('image'), async (req, res) => {
     try {
+        const { name, category, price, stock, description, shelfLife, weight, ingredients } = req.body;
+
         const product = await Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
         // Update fields
-        product.name = req.body.name || product.name;
-        product.category = req.body.category || product.category;
-        product.price = req.body.price || product.price;
-        product.stock = req.body.stock || product.stock;
-        product.description = req.body.description || product.description;
-        product.shelfLife = req.body.shelfLife || product.shelfLife;
-        product.weight = req.body.weight || product.weight;
-        product.ingredients = req.body.ingredients || product.ingredients;
+        product.name = name || product.name;
+        product.category = category || product.category;
+        product.price = price || product.price;
+        product.stock = stock || product.stock;
+        product.description = description || product.description;
+        product.shelfLife = shelfLife || product.shelfLife;
+        product.weight = weight || product.weight;
+        product.ingredients = ingredients || product.ingredients;
 
         // Update image if new one is uploaded
         if (req.file) {
@@ -101,21 +105,22 @@ router.put('/:id', authenticateAdmin, upload.single('image'), async (req, res) =
         const updatedProduct = await product.save();
         res.json(updatedProduct);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Delete product (admin only)
+// Delete product (protected route)
 router.delete('/:id', authenticateAdmin, async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findByIdAndDelete(req.params.id);
+
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
-        await product.remove();
-        res.json({ message: 'Product deleted' });
+
+        res.json({ message: 'Product deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
