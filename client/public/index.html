@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css">
 </head>
 <body>
     <!-- Special Offers Banner -->
@@ -28,8 +29,8 @@
                 </div>
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="Search sweets...">
-                <button><i class="fas fa-search"></i></button>
+                <input type="text" id="productSearch" placeholder="Search sweets...">
+                <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
             </div>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
@@ -39,10 +40,352 @@
                 <li><a href="#contact">Contact</a></li>
             </ul>
             <div class="cart-icon" onclick="toggleCart()">
-                🛒 <span class="cart-count">0</span>
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
             </div>
         </nav>
     </header>
+
+    <style>
+        /* Add cart icon styles */
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #333;
+            padding: 0.5rem;
+        }
+
+        .cart-icon:hover {
+            color: #ff6b6b;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+
+        /* Update cart modal styles */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .cart-modal.show {
+            display: block;
+        }
+
+        .cart-content {
+            padding: 20px;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .cart-item-actions button {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .remove-item {
+            color: #ff6b6b;
+            border: none !important;
+        }
+
+        .cart-item-total {
+            font-weight: bold;
+        }
+
+        .cart-total {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .checkout-btn {
+            padding: 10px 20px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        /* Shop Gallery Styles */
+        .shop-gallery {
+            padding: 2rem 0;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: #f5f5f5;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .view-more-container {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .view-more-btn {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .view-more-btn:hover {
+            background: #6B0000;
+            transform: translateY(-2px);
+        }
+
+        .view-more-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .view-more-btn:hover i {
+            transform: translateY(3px);
+        }
+
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .gallery-item {
+                min-height: 250px;
+            }
+        }
+
+        /* Swiper Navigation */
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #8B0000;
+            background: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .swiper-button-next:after,
+        .swiper-button-prev:after {
+            font-size: 1rem;
+        }
+
+        .swiper-pagination-bullet {
+            background: #8B0000;
+            opacity: 0.5;
+            width: 6px;
+            height: 6px;
+        }
+
+        .swiper-pagination-bullet-active {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-card {
+                height: 250px;
+                width: 160px;
+            }
+        }
+
+        /* Update the grid layout */
+        .namkeen-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Show 3 cards per row */
+            gap: 1.5rem;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Make cards smaller */
+        .namkeen-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            max-width: 350px; /* Limit maximum width */
+            margin: 0 auto;
+        }
+
+        .namkeen-image {
+            position: relative;
+            height: 180px; /* Reduced height */
+            overflow: hidden;
+        }
+
+        .namkeen-content {
+            padding: 1rem; /* Reduced padding */
+        }
+
+        .namkeen-header h3 {
+            font-size: 1.1rem; /* Slightly smaller font */
+        }
+
+        .description {
+            font-size: 0.85rem; /* Smaller description text */
+            margin-bottom: 0.8rem;
+        }
+
+        .price {
+            font-size: 1.1rem; /* Smaller price text */
+        }
+
+        .button-group {
+            gap: 0.3rem; /* Reduced gap between buttons */
+        }
+
+        .view-details-btn, .add-cart-btn {
+            padding: 0.6rem 0.8rem; /* Smaller button padding */
+            font-size: 0.9rem; /* Smaller button text */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .namkeen-grid {
+                grid-template-columns: repeat(3, 1fr); /* Keep 3 columns on medium screens */
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .namkeen-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .namkeen-grid {
+                grid-template-columns: 1fr; /* 1 column on mobile */
+            }
+        }
+    </style>
 
     <!-- Shopping Cart Modal -->
     <div class="cart-modal" id="cartModal">
@@ -51,12 +394,12 @@
                 <h2>Your Cart</h2>
                 <button class="close-cart" onclick="toggleCart()">&times;</button>
             </div>
-            <div class="cart-items">
+            <div class="cart-items" id="cartItems">
                 <!-- Cart items will be dynamically added here -->
             </div>
             <div class="cart-total">
                 <h3>Total: <span id="cartTotal">₹0</span></h3>
-                <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                <button class="checkout-btn" onclick="initializeCheckout()">Proceed to Checkout</button>
             </div>
         </div>
     </div>
@@ -125,7 +468,7 @@
         </div>
     </section>
 
-   
+
     <!-- Signature Sweets Section -->
     <section class="signature-sweets">
         <div class="container">
@@ -133,112 +476,126 @@
                 <h2>Featured Delicacies</h2>
                 <p>Our most beloved and cherished creations</p>
             </div>
-            <div class="signature-grid">
-                <div class="signature-card" data-type="sweet" data-id="kaju-katli" data-aos="fade-up" data-aos-delay="100">
-                    <div class="signature-image">
-                        <img src="images/signature/kaju-katli.jpg" 
-                             alt="Kaju Katli" 
-                             onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Kaju+Katli'">
-                        <span class="signature-badge">Bestseller</span>
-                        <button class="quick-view-btn" onclick="showQuickView('kaju-katli')">
-                            <i class="fas fa-eye"></i> Quick View
-                        </button>
-                    </div>
-                    <div class="signature-content">
-                        <h3>Kaju Katli</h3>
-                        <p>Delicious kaju katli with a crunchy texture and a rich, creamy filling</p>
-                        <div class="signature-details">
-                            <span><i class="fas fa-clock"></i> 7 days shelf life</span>
-                            <span><i class="fas fa-star"></i> 4.9/5</span>
+            <div class="swiper signature-swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="signature-card" data-type="sweet" data-id="kaju-katli">
+                            <div class="signature-image">
+                                <img src="images/signature/kaju-katli.jpg" 
+                                     alt="Kaju Katli" 
+                                     onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Kaju+Katli'">
+                                <span class="signature-badge">Bestseller</span>
+                            </div>
+                            <div class="signature-content">
+                                <h3>Kaju Katli</h3>
+                                <p>Delicious kaju katli with a crunchy texture and a rich, creamy filling</p>
+                                <div class="signature-details">
+                                    <span><i class="fas fa-clock"></i> 7 days shelf life</span>
+                                    <span><i class="fas fa-star"></i> 4.9/5</span>
+                                </div>
+                                <button class="view-details-btn" onclick="showSweetDetails('kaju-katli')">View Details</button>
+                            </div>
                         </div>
-                        <button class="view-details-btn" onclick="showSweetDetails('kaju-katli')">View Details</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="signature-card" data-type="sweet" data-id="rasmalai">
+                            <div class="signature-image">
+                                <img src="images/signature/rasmalai.jpg" 
+                                     alt="Rasmalai" 
+                                     onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Rasmalai'">
+                                <span class="signature-badge">Popular</span>
+                            </div>
+                            <div class="signature-content">
+                                <h3>Rasmalai</h3>
+                                <p>Soft cottage cheese dumplings soaked in sweetened milk</p>
+                                <div class="signature-details">
+                                    <span><i class="fas fa-clock"></i> 5 days shelf life</span>
+                                    <span><i class="fas fa-star"></i> 4.8/5</span>
+                                </div>
+                                <button class="view-details-btn" onclick="showSweetDetails('rasmalai')">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="signature-card" data-type="sweet" data-id="gulab-jamun">
+                            <div class="signature-image">
+                                <img src="images/signature/gulab-jamun.jpg" 
+                                     alt="Gulab Jamun" 
+                                     onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Gulab+Jamun'">
+                                <span class="signature-badge">Classic</span>
+                            </div>
+                            <div class="signature-content">
+                                <h3>Gulab Jamun</h3>
+                                <p>Soft, melt-in-mouth milk dough balls in sugar syrup</p>
+                                <div class="signature-details">
+                                    <span><i class="fas fa-clock"></i> 6 days shelf life</span>
+                                    <span><i class="fas fa-star"></i> 4.7/5</span>
+                                </div>
+                                <button class="view-details-btn" onclick="showSweetDetails('gulab-jamun')">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="signature-card" data-type="sweet" data-id="soan-papdi">
+                            <div class="signature-image">
+                                <img src="images/signature/soan-papdi.jpg" 
+                                     alt="Soan Papdi" 
+                                     onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Soan+Papdi'">
+                                <span class="signature-badge">Premium</span>
+                            </div>
+                            <div class="signature-content">
+                                <h3>Soan Papdi</h3>
+                                <p>Flaky, melt-in-mouth sweet with gram flour and ghee</p>
+                                <div class="signature-details">
+                                    <span><i class="fas fa-clock"></i> 15 days shelf life</span>
+                                    <span><i class="fas fa-star"></i> 4.8/5</span>
+                                </div>
+                                <button class="view-details-btn" onclick="showSweetDetails('soan-papdi')">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="signature-card" data-type="sweet" data-id="motichoor-ladoo">
+                            <div class="signature-image">
+                                <img src="images/signature/motichoor-ladoo.jpg" 
+                                     alt="Motichoor Ladoo" 
+                                     onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Motichoor+Ladoo'">
+                                <span class="signature-badge">Festive</span>
+                            </div>
+                            <div class="signature-content">
+                                <h3>Motichoor Ladoo</h3>
+                                <p>Tiny gram flour pearls shaped into perfect spheres</p>
+                                <div class="signature-details">
+                                    <span><i class="fas fa-clock"></i> 8 days shelf life</span>
+                                    <span><i class="fas fa-star"></i> 4.9/5</span>
+                                </div>
+                                <button class="view-details-btn" onclick="showSweetDetails('motichoor-ladoo')">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="signature-card" data-type="sweet" data-id="rajbhog">
+                            <div class="signature-image">
+                                <img src="images/signature/rajbhog.jpg" 
+                                     alt="Rajbhog" 
+                                     onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Rajbhog'">
+                                <span class="signature-badge">Premium</span>
+                            </div>
+                            <div class="signature-content">
+                                <h3>Rajbhog</h3>
+                                <p>Rich cottage cheese dumpling stuffed with dry fruits</p>
+                                <div class="signature-details">
+                                    <span><i class="fas fa-clock"></i> 4 days shelf life</span>
+                                    <span><i class="fas fa-star"></i> 4.8/5</span>
+                                </div>
+                                <button class="view-details-btn" onclick="showSweetDetails('rajbhog')">View Details</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="signature-card" data-type="sweet" data-id="rasmalai" data-aos="fade-up" data-aos-delay="200">
-                    <div class="signature-image">
-                        <img src="images/signature/rasmalai.jpg" 
-                             alt="Rasmalai" 
-                             onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Rasmalai'">
-                        <div class="signature-badge">Popular</div>
-                    </div>
-                    <div class="signature-content">
-                        <h3>Rasmalai</h3>
-                        <p>Soft cottage cheese dumplings soaked in sweetened milk</p>
-                        <div class="signature-details">
-                            <span><i class="fas fa-clock"></i> 5 days shelf life</span>
-                            <span><i class="fas fa-star"></i> 4.8/5</span>
-                        </div>
-                        <button class="view-details-btn">View Details</button>
-                    </div>
-                </div>
-                <div class="signature-card" data-type="sweet" data-id="gulab-jamun" data-aos="fade-up" data-aos-delay="300">
-                    <div class="signature-image">
-                        <img src="images/signature/gulab-jamun.jpg" 
-                             alt="Gulab Jamun" 
-                             onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Gulab+Jamun'">
-                        <div class="signature-badge">Classic</div>
-                    </div>
-                    <div class="signature-content">
-                        <h3>Gulab Jamun</h3>
-                        <p>Deep-fried milk dumplings soaked in sugar syrup</p>
-                        <div class="signature-details">
-                            <span><i class="fas fa-clock"></i> 6 days shelf life</span>
-                            <span><i class="fas fa-star"></i> 4.7/5</span>
-                        </div>
-                        <button class="view-details-btn">View Details</button>
-                    </div>
-                </div>
-                <div class="signature-card" data-type="sweet" data-id="soan-papdi" data-aos="fade-up" data-aos-delay="400">
-                    <div class="signature-image">
-                        <img src="images/signature/soan-papdi.jpg" 
-                             alt="Soan Papdi" 
-                             onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Soan+Papdi'">
-                        <div class="signature-badge">Traditional</div>
-                    </div>
-                    <div class="signature-content">
-                        <h3>Kalakand</h3>
-                        <p>Flaky, melt-in-mouth sweet made with gram flour and ghee</p>
-                        <div class="signature-details">
-                            <span><i class="fas fa-clock"></i> 15 days shelf life</span>
-                            <span><i class="fas fa-star"></i> 4.8/5</span>
-                        </div>
-                        <button class="view-details-btn">View Details</button>
-                    </div>
-                </div>
-                <div class="signature-card" data-type="sweet" data-id="motichoor-ladoo" data-aos="fade-up" data-aos-delay="500">
-                    <div class="signature-image">
-                        <img src="images/signature/motichoor-ladoo.jpg" 
-                             alt="Motichoor Ladoo" 
-                             onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Motichoor+Ladoo'">
-                        <div class="signature-badge">Festival Special</div>
-                    </div>
-                    <div class="signature-content">
-                        <h3>Motichoor Ladoo</h3>
-                        <p>Fine gram flour pearls combined with sugar syrup</p>
-                        <div class="signature-details">
-                            <span><i class="fas fa-clock"></i> 8 days shelf life</span>
-                            <span><i class="fas fa-star"></i> 4.9/5</span>
-                        </div>
-                        <button class="view-details-btn">View Details</button>
-                    </div>
-                </div>
-                <div class="signature-card" data-type="sweet" data-id="rajbhog" data-aos="fade-up" data-aos-delay="600">
-                    <div class="signature-image">
-                        <img src="images/signature/rajbhog.jpg" 
-                             alt="Rajbhog" 
-                             onerror="this.src='https://via.placeholder.com/800x600/f5f5f5/333?text=Rajbhog'">
-                        <div class="signature-badge">Premium</div>
-                    </div>
-                    <div class="signature-content">
-                        <h3>Rajbhog</h3>
-                        <p>Rich cottage cheese dumpling stuffed with dry fruits</p>
-                        <div class="signature-details">
-                            <span><i class="fas fa-clock"></i> 4 days shelf life</span>
-                            <span><i class="fas fa-star"></i> 4.8/5</span>
-                        </div>
-                        <button class="view-details-btn">View Details</button>
-                    </div>
-                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
             <div class="view-more-container">
                 <a href="sweets.html" class="view-more-btn">
@@ -319,156 +676,914 @@
                 <h2>Traditional Namkeen</h2>
                 <p>Savory delights crafted with authentic spices and premium ingredients</p>
             </div>
-            <div class="namkeen-categories">
-                <button class="category-btn active" data-category="all">All</button>
-                <button class="category-btn" data-category="traditional">Traditional Mix</button>
-                <button class="category-btn" data-category="bhujia">Bhujia Varieties</button>
-                <button class="category-btn" data-category="mixture">Mixtures</button>
-                <button class="category-btn" data-category="mathri">Mathri & Kachori</button>
+
+            <!-- Advanced Filter System -->
+            <div class="advanced-filters">
+                <div class="filter-group">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-th-large"></i> All
+                    </button>
+                    <button class="filter-btn" data-filter="traditional">
+                        <i class="fas fa-pepper-hot"></i> Traditional
+                    </button>
+                    <button class="filter-btn" data-filter="bhujia">
+                        <i class="fas fa-fire"></i> Bhujia
+                    </button>
+                    <button class="filter-btn" data-filter="mixture">
+                        <i class="fas fa-layer-group"></i> Mixtures
+                    </button>
+                    <button class="filter-btn" data-filter="mathri">
+                        <i class="fas fa-circle"></i> Mathri
+                    </button>
+                </div>
+                <div class="sort-group">
+                    <select class="sort-select" id="namkeenSort">
+                        <option value="popular">Most Popular</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+                </div>
             </div>
+
+            <!-- Namkeen Grid -->
             <div class="namkeen-grid">
-                <div class="namkeen-card" data-type="namkeen" data-id="aloo-bhujia" data-aos="fade-up" data-aos-delay="100">
+                <!-- Traditional Category -->
+                <div class="namkeen-card" data-category="traditional" data-price="180">
                     <div class="namkeen-image">
-                        <img src="images/namkeen/alu_bhojia.jpeg" alt="Aloo Bhujia" onerror="this.src='https://via.placeholder.com/300x200?text=Aloo+Bhujia'">
-                        <span class="namkeen-badge">Spicy</span>
+                        <img src="images/namkeen/dal_mot.jpg" alt="Dal Moth" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge bestseller">Bestseller</span>
+                            <span class="badge premium">Premium</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'dal-moth')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="namkeen-content">
-                        <h3>Aloo Bhujia</h3>
-                        <p>Crispy potato noodles with traditional spices</p>
+                        <div class="namkeen-header">
+                            <h3>Dal Moth Special</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                        <p class="description">Crispy lentil-based snack with aromatic spices</p>
                         <div class="namkeen-details">
-                            <span class="price">₹160/500g</span>
+                            <div class="price-info">
+                                <span class="price">₹180</span>
+                                <span class="unit">/500g</span>
+                            </div>
                             <div class="button-group">
-                                <button class="view-details-btn">View Details</button>
-                                <button class="add-cart-btn" onclick="addToCart('aloo-bhujia')">Add to Cart</button>
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'dal-moth')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('dal-moth')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="namkeen-card" data-type="namkeen" data-id="dal-moth" data-aos="fade-up" data-aos-delay="200">
+                <div class="namkeen-card" data-category="traditional" data-price="200">
                     <div class="namkeen-image">
-                        <img src="images/namkeen/dal_mot.jpg" alt="Dal Moth" onerror="this.src='https://via.placeholder.com/300x200?text=Dal+Moth'">
-                        <span class="namkeen-badge">Bestseller</span>
+                        <img src="images/namkeen/mixture.jpg" alt="Traditional Mixture" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge popular">Popular</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'traditional-mixture')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="namkeen-content">
-                        <h3>Dal Moth Special</h3>
-                        <p>Crispy lentil-based snack with aromatic spices</p>
+                        <div class="namkeen-header">
+                            <h3>Traditional Mixture</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                        <p class="description">Classic mix of various crispy snacks and nuts</p>
                         <div class="namkeen-details">
-                            <span class="price">₹180/500g</span>
+                            <div class="price-info">
+                                <span class="price">₹200</span>
+                                <span class="unit">/500g</span>
+                            </div>
                             <div class="button-group">
-                                <button class="view-details-btn" data-namkeen="dal-moth">View Details</button>
-                                <button class="add-cart-btn" onclick="addToCart('dal-moth')">Add to Cart</button>
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'traditional-mixture')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('traditional-mixture')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="namkeen-card" data-type="namkeen" data-id="khatta-meetha" data-aos="fade-up" data-aos-delay="300">
+                <div class="namkeen-card" data-category="traditional" data-price="220">
                     <div class="namkeen-image">
-                        <img src="images/namkeen/khata_meetha.jpg" alt="Khatta Meetha" onerror="this.src='https://via.placeholder.com/300x200?text=Khatta+Meetha'">
-                        <span class="namkeen-badge">Popular</span>
+                        <img src="images/namkeen/chakli.jpg" alt="Chakli" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge traditional">Traditional</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'chakli')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="namkeen-content">
-                        <h3>Khatta Meetha</h3>
-                        <p>Sweet and tangy mix with dried fruits</p>
+                        <div class="namkeen-header">
+                            <h3>Spiral Chakli</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.7</span>
+                            </div>
+                        </div>
+                        <p class="description">Crispy spiral-shaped snack with traditional spices</p>
                         <div class="namkeen-details">
-                            <span class="price">₹200/500g</span>
+                            <div class="price-info">
+                                <span class="price">₹220</span>
+                                <span class="unit">/500g</span>
+                            </div>
                             <div class="button-group">
-                                <button class="view-details-btn" data-namkeen="khatta-meetha">View Details</button>
-                                <button class="add-cart-btn" onclick="addToCart('khatta-meetha')">Add to Cart</button>
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'chakli')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('chakli')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="namkeen-card" data-type="namkeen" data-id="masala-mathri" data-aos="fade-up" data-aos-delay="400">
+                <!-- Bhujia Category -->
+                <div class="namkeen-card" data-category="bhujia" data-price="160">
                     <div class="namkeen-image">
-                        <img src="images/namkeen/masala_mathri.jpeg" alt="Masala Mathri" onerror="this.src='https://via.placeholder.com/300x200?text=Masala+Mathri'">
-                        <span class="namkeen-badge">Traditional</span>
+                        <img src="images/namkeen/alu_bhojia.jpeg" alt="Aloo Bhujia" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge spicy">Spicy</span>
+                            <span class="badge bestseller">Bestseller</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'aloo-bhujia')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="namkeen-content">
-                        <h3>Masala Mathri</h3>
-                        <p>Flaky, spiced crackers made with premium flour</p>
+                        <div class="namkeen-header">
+                            <h3>Aloo Bhujia</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                        <p class="description">Crispy potato noodles with traditional spices</p>
                         <div class="namkeen-details">
-                            <span class="price">₹220/500g</span>
+                            <div class="price-info">
+                                <span class="price">₹160</span>
+                                <span class="unit">/500g</span>
+                            </div>
                             <div class="button-group">
-                                <button class="view-details-btn" data-namkeen="masala-mathri">View Details</button>
-                                <button class="add-cart-btn" onclick="addToCart('masala-mathri')">Add to Cart</button>
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'aloo-bhujia')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('aloo-bhujia')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="namkeen-card" data-category="bhujia" data-price="180">
+                    <div class="namkeen-image">
+                        <img src="images/namkeen/moong_bhujia.jpg" alt="Moong Bhujia" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge premium">Premium</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'moong-bhujia')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="namkeen-content">
+                        <div class="namkeen-header">
+                            <h3>Moong Bhujia</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                        <p class="description">Crispy moong dal noodles with special spices</p>
+                        <div class="namkeen-details">
+                            <div class="price-info">
+                                <span class="price">₹180</span>
+                                <span class="unit">/500g</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'moong-bhujia')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('moong-bhujia')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="namkeen-card" data-category="bhujia" data-price="200">
+                    <div class="namkeen-image">
+                        <img src="images/namkeen/besan_bhujia.jpg" alt="Besan Bhujia" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge spicy">Spicy</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'besan-bhujia')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="namkeen-content">
+                        <div class="namkeen-header">
+                            <h3>Besan Bhujia</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.7</span>
+                            </div>
+                        </div>
+                        <p class="description">Crispy gram flour noodles with special spices</p>
+                        <div class="namkeen-details">
+                            <div class="price-info">
+                                <span class="price">₹200</span>
+                                <span class="unit">/500g</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'besan-bhujia')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('besan-bhujia')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mixture Category -->
+                <div class="namkeen-card" data-category="mixture" data-price="220">
+                    <div class="namkeen-image">
+                        <img src="images/namkeen/khata_meetha.jpg" alt="Khatta Meetha" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge popular">Popular</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'khatta-meetha')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="namkeen-content">
+                        <div class="namkeen-header">
+                            <h3>Khatta Meetha</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                        <p class="description">Sweet and tangy mix with dried fruits</p>
+                        <div class="namkeen-details">
+                            <div class="price-info">
+                                <span class="price">₹220</span>
+                                <span class="unit">/500g</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'khatta-meetha')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('khatta-meetha')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="namkeen-card" data-category="mixture" data-price="240">
+                    <div class="namkeen-image">
+                        <img src="images/namkeen/dry_fruit_mixture.jpg" alt="Dry Fruit Mixture" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge premium">Premium</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'dry-fruit-mixture')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="namkeen-content">
+                        <div class="namkeen-header">
+                            <h3>Dry Fruit Mixture</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                        <p class="description">Premium mix of nuts and dried fruits</p>
+                        <div class="namkeen-details">
+                            <div class="price-info">
+                                <span class="price">₹240</span>
+                                <span class="unit">/500g</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'dry-fruit-mixture')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('dry-fruit-mixture')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="namkeen-card" data-category="mixture" data-price="200">
+                    <div class="namkeen-image">
+                        <img src="images/namkeen/spicy_mixture.jpg" alt="Spicy Mixture" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge spicy">Spicy</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'spicy-mixture')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="namkeen-content">
+                        <div class="namkeen-header">
+                            <h3>Spicy Mixture</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.7</span>
+                            </div>
+                        </div>
+                        <p class="description">Hot and spicy mix of various snacks</p>
+                        <div class="namkeen-details">
+                            <div class="price-info">
+                                <span class="price">₹200</span>
+                                <span class="unit">/500g</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'spicy-mixture')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('spicy-mixture')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mathri Category -->
+                <div class="namkeen-card" data-category="mathri" data-price="180">
+                    <div class="namkeen-image">
+                        <img src="images/namkeen/masala_mathri.jpeg" alt="Masala Mathri" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge traditional">Traditional</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'masala-mathri')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="namkeen-content">
+                        <div class="namkeen-header">
+                            <h3>Masala Mathri</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                        <p class="description">Flaky, spiced crackers made with premium flour</p>
+                        <div class="namkeen-details">
+                            <div class="price-info">
+                                <span class="price">₹180</span>
+                                <span class="unit">/500g</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'masala-mathri')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('masala-mathri')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="namkeen-card" data-category="mathri" data-price="200">
+                    <div class="namkeen-image">
+                        <img src="images/namkeen/ajwain_mathri.jpg" alt="Ajwain Mathri" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge premium">Premium</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'ajwain-mathri')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="namkeen-content">
+                        <div class="namkeen-header">
+                            <h3>Ajwain Mathri</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                        <p class="description">Flaky crackers with carom seeds</p>
+                        <div class="namkeen-details">
+                            <div class="price-info">
+                                <span class="price">₹200</span>
+                                <span class="unit">/500g</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'ajwain-mathri')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('ajwain-mathri')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="namkeen-card" data-category="mathri" data-price="220">
+                    <div class="namkeen-image">
+                        <img src="images/namkeen/methi_mathri.jpg" alt="Methi Mathri" onerror="this.src='images/placeholder.jpg'">
+                        <div class="namkeen-badges">
+                            <span class="badge healthy">Healthy</span>
+                        </div>
+                        <div class="namkeen-overlay">
+                            <div class="overlay-content">
+                                <button class="quick-view-btn" onclick="showItemDetails('namkeen', 'methi-mathri')">
+                                    <i class="fas fa-eye"></i> Quick View
+                                </button>
+                                <div class="overlay-info">
+                                    <span><i class="fas fa-clock"></i> Fresh Daily</span>
+                                    <span><i class="fas fa-box"></i> 500g Pack</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="namkeen-content">
+                        <div class="namkeen-header">
+                            <h3>Methi Mathri</h3>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.7</span>
+                            </div>
+                        </div>
+                        <p class="description">Fenugreek flavored crispy crackers</p>
+                        <div class="namkeen-details">
+                            <div class="price-info">
+                                <span class="price">₹220</span>
+                                <span class="unit">/500g</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="view-details-btn" onclick="showItemDetails('namkeen', 'methi-mathri')">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </button>
+                                <button class="add-cart-btn" onclick="addToCart('methi-mathri')">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Namkeen Details Modal -->
-            <div class="namkeen-modal" id="namkeenModal">
-                <div class="modal-content">
-                    <span class="close-modal" onclick="closeNamkeenDetails()">&times;</span>
-                    <div class="modal-body">
-                        <div class="namkeen-details-content">
-                            <div class="namkeen-image-large">
-                                <img id="modalNamkeenImage" src="" alt="Namkeen Image">
-                            </div>
-                            <div class="namkeen-info">
-                                <h2 id="modalNamkeenTitle"></h2>
-                                <p id="modalNamkeenDescription"></p>
-                                <div class="namkeen-price-details">
-                                    <div class="price-info">
-                                        <span class="price" id="modalNamkeenPrice"></span>
-                                        <span class="quantity" id="modalNamkeenQuantity"></span>
-                                    </div>
-                                </div>
-                                <div class="namkeen-features" id="modalNamkeenFeatures">
-                                    <div class="feature">
-                                        <i class="fas fa-pepper-hot"></i>
-                                        <span id="modalSpiceLevel"></span>
-                                    </div>
-                                    <div class="feature">
-                                        <i class="fas fa-star"></i>
-                                        <span id="modalRating"></span>
-                                    </div>
-                                    <div class="feature">
-                                        <i class="fas fa-box"></i>
-                                        <span id="modalPackaging"></span>
-                                    </div>
-                                </div>
-                                <div class="ingredients-section">
-                                    <h3>Ingredients</h3>
-                                    <p id="modalIngredients"></p>
-                                </div>
-                                <div class="nutritional-info">
-                                    <h3>Nutritional Information</h3>
-                                    <div id="modalNutritionalInfo"></div>
-                                </div>
-                                <div class="quantity-selector">
-                                    <button class="quantity-btn" onclick="decrementQuantity()">-</button>
-                                    <input type="number" id="namkeenQuantity" value="1" min="1" max="20">
-                                    <button class="quantity-btn" onclick="incrementQuantity()">+</button>
-                                </div>
-                                <button class="add-to-cart-btn" onclick="addToCart()">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="namkeen-features">
-                <div class="feature">
-                    <i class="fas fa-medal"></i>
-                    <h4>Premium Quality</h4>
-                    <p>Made with finest ingredients</p>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-shipping-fast"></i>
-                    <h4>Quick Delivery</h4>
-                    <p>Fresh from our kitchen to your home</p>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-certificate"></i>
-                    <h4>100% Pure</h4>
-                    <p>No artificial preservatives</p>
-                </div>
-            </div>
+
+            <style>
+                .namkeen-section {
+                    padding: 4rem 0;
+                    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+                }
+
+                .advanced-filters {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin: 2rem 0;
+                    padding: 1rem;
+                    background: white;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                }
+
+                .filter-group {
+                    display: flex;
+                    gap: 1rem;
+                    flex-wrap: wrap;
+                }
+
+                .filter-btn {
+                    padding: 0.8rem 1.5rem;
+                    border: none;
+                    border-radius: 25px;
+                    background: #f5f5f5;
+                    color: #333;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .filter-btn.active {
+                    background: #8B0000;
+                    color: white;
+                }
+
+                .filter-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+                }
+
+                .sort-select {
+                    padding: 0.8rem 1.5rem;
+                    border: 1px solid #ddd;
+                    border-radius: 25px;
+                    background: white;
+                    color: #333;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .namkeen-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr); /* Show 3 cards per row */
+                    gap: 1.5rem;
+                    padding: 1rem;
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+
+                .namkeen-card {
+                    background: white;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                    transition: all 0.3s ease;
+                    position: relative;
+                    max-width: 350px; /* Limit maximum width */
+                    margin: 0 auto;
+                }
+
+                .namkeen-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                }
+
+                .namkeen-image {
+                    position: relative;
+                    height: 180px; /* Reduced height */
+                    overflow: hidden;
+                }
+
+                .namkeen-image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.5s ease;
+                }
+
+                .namkeen-card:hover .namkeen-image img {
+                    transform: scale(1.1);
+                }
+
+                .namkeen-badges {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+
+                .badge {
+                    padding: 0.3rem 0.8rem;
+                    border-radius: 15px;
+                    font-size: 0.8rem;
+                    font-weight: 500;
+                    color: white;
+                }
+
+                .badge.spicy {
+                    background: #ff6b6b;
+                }
+
+                .badge.bestseller {
+                    background: #8B0000;
+                }
+
+                .badge.premium {
+                    background: #ffd700;
+                    color: #333;
+                }
+
+                .namkeen-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.7);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+
+                .namkeen-card:hover .namkeen-overlay {
+                    opacity: 1;
+                }
+
+                .overlay-content {
+                    text-align: center;
+                    color: white;
+                }
+
+                .quick-view-btn {
+                    background: white;
+                    color: #333;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    margin-bottom: 1rem;
+                }
+
+                .quick-view-btn:hover {
+                    background: #8B0000;
+                    color: white;
+                }
+
+                .overlay-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+
+                .overlay-info span {
+                    font-size: 0.9rem;
+                }
+
+                .namkeen-content {
+                    padding: 1.5rem;
+                }
+
+                .namkeen-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 0.5rem;
+                }
+
+                .namkeen-header h3 {
+                    font-size: 1.2rem;
+                    color: #333;
+                    margin: 0;
+                }
+
+                .rating {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.3rem;
+                    color: #ffc107;
+                }
+
+                .description {
+                    color: #666;
+                    font-size: 0.9rem;
+                    margin-bottom: 1rem;
+                    line-height: 1.4;
+                }
+
+                .namkeen-details {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .price-info {
+                    display: flex;
+                    align-items: baseline;
+                    gap: 0.3rem;
+                }
+
+                .price {
+                    font-size: 1.3rem;
+                    font-weight: 600;
+                    color: #8B0000;
+                }
+
+                .unit {
+                    font-size: 0.9rem;
+                    color: #666;
+                }
+
+                .button-group {
+                    display: flex;
+                    gap: 0.5rem;
+                }
+
+                .view-details-btn, .add-cart-btn {
+                    padding: 0.8rem 1.2rem;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .view-details-btn {
+                    background: #f0f0f0;
+                    color: #333;
+                }
+
+                .add-cart-btn {
+                    background: #8B0000;
+                    color: white;
+                }
+
+                .view-details-btn:hover, .add-cart-btn:hover {
+                    opacity: 0.9;
+                    transform: translateY(-2px);
+                }
+
+                @media (max-width: 1024px) {
+                    .namkeen-grid {
+                        grid-template-columns: repeat(3, 1fr); /* Keep 3 columns on medium screens */
+                        gap: 1rem;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .namkeen-grid {
+                        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .namkeen-grid {
+                        grid-template-columns: 1fr; /* 1 column on mobile */
+                    }
+                }
+            </style>
+
+            <script>
+                // Filter functionality
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        // Remove active class from all buttons
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        // Add active class to clicked button
+                        btn.classList.add('active');
+                        
+                        const filter = btn.dataset.filter;
+                        filterNamkeens(filter);
+                    });
+                });
+
+                // Sort functionality
+                document.getElementById('namkeenSort').addEventListener('change', (e) => {
+                    sortNamkeens(e.target.value);
+                });
+
+                function filterNamkeens(category) {
+                    const cards = document.querySelectorAll('.namkeen-card');
+                    cards.forEach(card => {
+                        if (category === 'all' || card.dataset.category === category) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+
+                function sortNamkeens(sortBy) {
+                    const container = document.querySelector('.namkeen-grid');
+                    const cards = Array.from(container.children);
+
+                    cards.sort((a, b) => {
+                        const priceA = parseFloat(a.dataset.price);
+                        const priceB = parseFloat(b.dataset.price);
+
+                        switch(sortBy) {
+                            case 'price-low':
+                                return priceA - priceB;
+                            case 'price-high':
+                                return priceB - priceA;
+                            case 'popular':
+                                return Math.random() - 0.5; // Random sort for popularity
+                            case 'newest':
+                                return Math.random() - 0.5; // Random sort for newest
+                            default:
+                                return 0;
+                        }
+                    });
+
+                    cards.forEach(card => container.appendChild(card));
+                }
+            </script>
         </div>
     </section>
 
@@ -712,6 +1827,78 @@
             </div>
         </div>
     </section>
+
+    <!-- Shop Gallery Section -->
+    <section class="shop-gallery">
+        <div class="section-header">
+            <h2>Our Sweet Shop</h2>
+            <p>Take a virtual tour of our traditional sweet shop</p>
+        </div>
+        
+        <div class="gallery-grid" id="galleryGrid">
+            <div class="gallery-item">
+                <img src="images/shop/shop1.jpg" alt="Shop Photo 1" onerror="this.src='https://picsum.photos/400/500?random=1'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop2.jpg" alt="Shop Photo 2" onerror="this.src='https://picsum.photos/400/600?random=2'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop3.jpg" alt="Shop Photo 3" onerror="this.src='https://picsum.photos/400/700?random=3'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop4.jpg" alt="Shop Photo 4" onerror="this.src='https://picsum.photos/400/500?random=4'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop5.jpg" alt="Shop Photo 5" onerror="this.src='https://picsum.photos/400/600?random=5'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop6.jpg" alt="Shop Photo 6" onerror="this.src='https://picsum.photos/400/700?random=6'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop7.jpg" alt="Shop Photo 7" onerror="this.src='https://picsum.photos/400/500?random=7'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop8.jpg" alt="Shop Photo 8" onerror="this.src='https://picsum.photos/400/600?random=8'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop9.jpg" alt="Shop Photo 9" onerror="this.src='https://picsum.photos/400/700?random=9'">
+            </div>
+            <div class="gallery-item">
+                <img src="images/shop/shop10.jpg" alt="Shop Photo 10" onerror="this.src='https://picsum.photos/400/500?random=10'">
+            </div>
+        </div>
+
+        <div class="view-more-container">
+            <button class="view-more-btn" onclick="loadMorePhotos()">
+                <span>View More Photos</span>
+                <i class="fas fa-arrow-down"></i>
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Function to load more photos
+        function loadMorePhotos() {
+            const galleryGrid = document.getElementById('galleryGrid');
+            const currentItems = galleryGrid.children.length;
+            const itemsToAdd = 6; // Number of new items to add
+
+            for (let i = 1; i <= itemsToAdd; i++) {
+                const newItem = document.createElement('div');
+                newItem.className = 'gallery-item';
+                newItem.innerHTML = `
+                    <img src="images/shop/shop${currentItems + i}.jpg" 
+                         alt="Shop Photo ${currentItems + i}" 
+                         onerror="this.src='https://picsum.photos/400/${500 + (i * 100)}?random=${currentItems + i}'">
+                `;
+                galleryGrid.appendChild(newItem);
+            }
+
+            // Smooth scroll to new items
+            const newItems = galleryGrid.children[currentItems];
+            newItems.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
 
     <!-- Memories Gallery Section -->
     <section id="memories" class="memories">
@@ -1009,6 +2196,8 @@
     </a>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
     <script src="script.js"></script>
 
     <script>
@@ -1124,9 +2313,9 @@
                 id: 'kaju-katli',
                 title: 'Kaju Katli',
                 price: 800,
-                description: 'Delicious kaju katli with a crunchy texture and a rich, creamy filling',
+                description: 'Premium quality kaju katli made with pure cashews and cardamom.',
                 image: 'images/signature/kaju-katli.jpg',
-                badge: 'Bestseller',
+                badge: 'Dry Fruit',
                 shelfLife: '7 days',
                 rating: '4.9/5',
                 quantity: '250g',
@@ -1139,142 +2328,301 @@
             'rasmalai': {
                 id: 'rasmalai',
                 title: 'Rasmalai',
-                price: 600,
-                description: 'Soft cottage cheese dumplings soaked in sweetened milk',
+                price: 650,
+                description: 'Soft rasmalai in sweetened milk with saffron.',
                 image: 'images/signature/rasmalai.jpg',
-                badge: 'Popular',
+                badge: 'Bengali',
                 shelfLife: '5 days',
-                rating: '4.8/5',
+                rating: '4.9/5',
                 quantity: '500g',
                 features: [
                     { icon: 'fa-star', text: 'Fresh Daily' },
                     { icon: 'fa-clock', text: '5 Days Shelf Life' },
                     { icon: 'fa-award', text: 'Chef\'s Special' }
                 ]
+            },
+            'gulab-jamun': {
+                id: 'gulab-jamun',
+                title: 'Gulab Jamun',
+                price: 450,
+                description: 'Soft and juicy gulab jamun in sugar syrup.',
+                image: 'images/signature/gulab-jamun.jpg',
+                badge: 'Classic',
+                shelfLife: '6 days',
+                rating: '4.7/5',
+                quantity: '500g',
+                features: [
+                    { icon: 'fa-star', text: 'Traditional Recipe' },
+                    { icon: 'fa-clock', text: '6 Days Shelf Life' },
+                    { icon: 'fa-award', text: 'Customer Favorite' }
+                ]
+            },
+            'motichoor-laddu': {
+                id: 'motichoor-laddu',
+                title: 'Motichoor Laddu',
+                price: 600,
+                description: 'Delicate boondi laddus with saffron and cardamom.',
+                image: 'images/signature/motichoor.jpg',
+                badge: 'Festive',
+                shelfLife: '8 days',
+                rating: '4.8/5',
+                quantity: '500g',
+                features: [
+                    { icon: 'fa-star', text: 'Festive Special' },
+                    { icon: 'fa-clock', text: '8 Days Shelf Life' },
+                    { icon: 'fa-award', text: 'Best Seller' }
+                ]
             }
         };
 
-        // Cart functionality
-        let cart = [];
-        
+        // Cart data structure
+        let cart = JSON.parse(localStorage.getItem('cart')) || {};
+
+        // Function to update cart count
+        function updateCartCount() {
+            const cartCount = document.querySelector('.cart-count');
+            const totalItems = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
+
+        // Function to add item to cart
+        function addToCart(productId) {
+            try {
+                if (!sweetDetails[productId]) {
+                    console.error('Product not found:', productId);
+                    showToast('Product not found!');
+                    return;
+                }
+
+                if (cart[productId]) {
+                    cart[productId].quantity = (cart[productId].quantity || 0) + 1;
+                } else {
+                    cart[productId] = {
+                        ...sweetDetails[productId],
+                        quantity: 1
+                    };
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                showToast('Item added to cart!');
+                
+                // Open cart modal after adding item
+                const cartModal = document.getElementById('cartModal');
+                if (cartModal) {
+                    cartModal.classList.add('show');
+                    updateCartModal();
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('Error adding item to cart');
+            }
+        }
+
+        // Function to remove item from cart
+        function removeFromCart(productId) {
+            delete cart[productId];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartModal();
+            showToast('Item removed from cart!');
+        }
+
+        // Function to update item quantity in cart
+        function updateCartQuantity(productId, quantity) {
+            if (quantity <= 0) {
+                removeFromCart(productId);
+                return;
+            }
+            cart[productId].quantity = quantity;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartModal();
+        }
+
+        // Function to update cart modal
+        function updateCartModal() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            let total = 0;
+            let itemsHtml = '';
+
+            Object.entries(cart).forEach(([productId, item]) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                itemsHtml += `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.title}" onerror="this.src='images/placeholder.jpg'">
+                        <div class="cart-item-details">
+                            <h4>${item.title}</h4>
+                            <p>₹${item.price} x ${item.quantity}</p>
+                            <div class="cart-item-actions">
+                                <button onclick="updateCartQuantity('${productId}', ${item.quantity - 1})">-</button>
+                                <span>${item.quantity}</span>
+                                <button onclick="updateCartQuantity('${productId}', ${item.quantity + 1})">+</button>
+                                <button class="remove-item" onclick="removeFromCart('${productId}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cart-item-total">₹${itemTotal}</div>
+                    </div>
+                `;
+            });
+
+            cartItems.innerHTML = itemsHtml || '<p class="empty-cart">Your cart is empty</p>';
+            cartTotal.textContent = `₹${total}`;
+        }
+
+        // Function to show toast notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Function to toggle cart modal
         function toggleCart() {
             const cartModal = document.getElementById('cartModal');
-            cartModal.classList.toggle('active');
+            cartModal.classList.toggle('show');
+            if (cartModal.classList.contains('show')) {
+                updateCartModal();
+            }
         }
 
-        function proceedToCheckout() {
-            if (cart.length === 0) {
-                showNotification('Your cart is empty!', 'error');
+        // Initialize cart count on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            
+            // Close cart modal when clicking outside
+            document.addEventListener('click', function(event) {
+                const cartModal = document.getElementById('cartModal');
+                if (event.target === cartModal) {
+                    cartModal.classList.remove('show');
+                }
+            });
+        });
+
+        // Function to initialize checkout
+        function initializeCheckout() {
+            if (Object.keys(cart).length === 0) {
+                showToast('Your cart is empty!');
                 return;
             }
-
-            // Calculate total
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-            // Save cart data to localStorage
-            const cartData = {
-                items: cart.map(item => ({
-                    id: item.id,
-                    title: item.title,
-                    price: item.price,
-                    quantity: item.quantity,
-                    image: item.image
-                })),
-                total: total
-            };
-
-            localStorage.setItem('cartData', JSON.stringify(cartData));
-
-            // Redirect to payment page
-            window.location.href = 'payment.html';
+            // Add your checkout logic here
+            showToast('Proceeding to checkout...');
         }
 
-        function addToCart(sweetId, fromModal = false) {
-            const sweet = sweetDetails[sweetId];
-            if (!sweet) {
-                showNotification('Product not found!', 'error');
-                return;
+        // Product data structure
+        const products = {
+            'kaju-katli': {
+                title: 'Kaju Katli',
+                image: 'images/signature/kaju-katli.jpg',
+                badge: 'Dry Fruit',
+                price: 800,
+                rating: '4.9/5',
+                description: 'Premium quality kaju katli made with pure cashews and cardamom.',
+                category: 'sweets',
+                subcategory: 'dry-fruit-sweets'
+            },
+            'rasmalai': {
+                title: 'Rasmalai',
+                image: 'images/signature/rasmalai.jpg',
+                badge: 'Bengali',
+                price: 650,
+                rating: '4.9/5',
+                description: 'Soft rasmalai in sweetened milk with saffron.',
+                category: 'sweets',
+                subcategory: 'bengali-sweets'
+            },
+            'gulab-jamun': {
+                title: 'Gulab Jamun',
+                image: 'images/signature/gulab-jamun.jpg',
+                badge: 'Popular',
+                price: 550,
+                rating: '4.8/5',
+                description: 'Soft and juicy gulab jamun in sugar syrup.',
+                category: 'sweets',
+                subcategory: 'mawa-sweets'
+            },
+            'motichoor-laddu': {
+                title: 'Motichoor Laddu',
+                image: 'images/signature/motichoor.jpg',
+                badge: 'Festive',
+                price: 600,
+                rating: '4.8/5',
+                description: 'Delicate boondi laddus with saffron and cardamom.',
+                category: 'sweets',
+                subcategory: 'festive-sweets'
             }
+        };
 
-            const quantity = fromModal && document.getElementById('sweetQuantity') 
-                ? parseInt(document.getElementById('sweetQuantity').value) 
-                : 1;
-
-            const existingItem = cart.find(item => item.id === sweetId);
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({
-                    id: sweetId,
-                    title: sweet.title,
-                    price: sweet.price,
-                    quantity: quantity,
-                    image: sweet.image
-                });
-            }
-
-            updateCartUI();
-            showNotification('Item added to cart!', 'success');
-
-            if (fromModal) {
-                closeModal('sweetModal');
-            }
-        }
-
-        function updateCartUI() {
-            const cartCount = document.querySelector('.cart-count');
-            const cartTotal = document.getElementById('cartTotal');
-            const cartItems = document.querySelector('.cart-items');
-
-            const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-            cartCount.textContent = totalQuantity;
-            cartTotal.textContent = `₹${totalPrice}`;
-
-            cartItems.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <img src="${item.image}" alt="${item.title}" onerror="this.src='images/placeholder.jpg'">
-                    <div class="cart-item-details">
-                        <h4>${item.title}</h4>
-                        <p>₹${item.price} x ${item.quantity}</p>
+        // Function to create product card
+        function createProductCard(productId, productData) {
+            return `
+                <div class="product-card" data-category="${productData.category}" data-subcategory="${productData.subcategory || ''}">
+                    <div class="product-image">
+                        <img src="${productData.image}" alt="${productData.title}" onerror="this.src='images/placeholder.jpg'">
+                        ${productData.badge ? `<div class="product-badge">${productData.badge}</div>` : ''}
                     </div>
-                    <button onclick="removeFromCart('${item.id}')">&times;</button>
+                    <div class="product-content">
+                        <h3 class="product-title">${productData.title}</h3>
+                        <p class="product-description">${productData.description}</p>
+                        <div class="product-meta">
+                            <div class="product-price">₹${productData.price}</div>
+                            <div class="product-rating">
+                                <i class="fas fa-star"></i>
+                                <span>${productData.rating}</span>
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn view-details" onclick="showSweetDetails('${productId}')">
+                                View Details
+                            </button>
+                            <button class="action-btn add-to-cart" onclick="addToCart('${productId}')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            `).join('');
+            `;
         }
 
-        function removeFromCart(sweetId) {
-            cart = cart.filter(item => item.id !== sweetId);
-            updateCartUI();
-            showNotification('Item removed from cart!', 'info');
+        // Function to handle search
+        function searchProducts() {
+            const searchTerm = document.getElementById('productSearch').value.trim();
+            
+            if (!searchTerm) {
+                alert('Please enter a sweet name!');
+                return;
+            }
+            
+            // Redirect to sweets.html with search parameter
+            window.location.href = `sweets.html?search=${encodeURIComponent(searchTerm)}`;
         }
 
-        function showNotification(message, type = 'info') {
-            // Remove any existing notifications
-            const existingNotifications = document.querySelectorAll('.notification');
-            existingNotifications.forEach(notification => notification.remove());
+        // Add event listener for Enter key
+        document.getElementById('productSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchProducts();
+            }
+        });
 
-            // Create new notification
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            // Add fade-in class
-            setTimeout(() => notification.classList.add('show'), 10);
-
-            // Remove notification after delay
-            setTimeout(() => {
-                notification.classList.add('fade-out');
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
-        }
-
-        // Initialize cart UI on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCartUI();
+        // Initialize search on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show all products initially
+            searchProducts();
         });
     </script>
+
+    <!-- Add this before closing body tag -->
+    <script src="js/script.js"></script>
+
+    <!-- Add cart.js before closing body tag -->
+    <script src="js/cart.js"></script>
+
+    <!-- Scripts -->
+    <script src="js/sweets.js"></script>
 </body>
 </html> 

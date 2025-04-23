@@ -5,6 +5,7 @@ let paymentElement;
 
 // Load cart data and initialize page
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded, initializing...');
     loadCartData();
     initializePaymentMethods();
     initializeStripe();
@@ -13,38 +14,148 @@ document.addEventListener('DOMContentLoaded', function() {
 // Load cart data from localStorage
 function loadCartData() {
     try {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const summaryItems = document.getElementById('summaryItems');
-        let subtotal = 0;
+        console.log('Loading cart data...');
+        const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
+        console.log('Cart data:', cart);
+        
+        const orderItems = document.getElementById('orderItems');
+        const subtotal = document.getElementById('subtotal');
+        const total = document.getElementById('total');
+        const deliveryFee = 40;
+
+        if (!orderItems) {
+            console.error('Order items container not found');
+            return;
+        }
 
         // Clear existing items
-        summaryItems.innerHTML = '';
+        orderItems.innerHTML = '';
 
         // Add each item to the summary
-        cart.forEach(item => {
+        cart.items.forEach(item => {
+            console.log('Processing item:', item);
             const itemElement = document.createElement('div');
-            itemElement.className = 'summary-item';
+            itemElement.className = 'order-item';
             itemElement.innerHTML = `
                 <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
-            <div class="item-details">
+                <div class="order-item-details">
                     <h4>${item.name}</h4>
-                    <div class="item-meta">
-                        <span>Quantity: ${item.quantity}</span>
-                    </div>
+                    <p>₹${item.price} x ${item.quantity}</p>
                 </div>
                 <div class="item-price">₹${item.price * item.quantity}</div>
             `;
-            summaryItems.appendChild(itemElement);
-            subtotal += item.price * item.quantity;
+            orderItems.appendChild(itemElement);
         });
 
         // Update totals
-        document.getElementById('subtotalAmount').textContent = `₹${subtotal}`;
-        document.getElementById('totalAmount').textContent = `₹${subtotal}`; // Add shipping if needed
+        const subtotalAmount = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        console.log('Subtotal:', subtotalAmount);
+        
+        if (subtotal) subtotal.textContent = `₹${subtotalAmount}`;
+        if (total) total.textContent = `₹${subtotalAmount + deliveryFee}`;
     } catch (error) {
         console.error('Error loading cart data:', error);
         showError('Failed to load cart data. Please try again.');
     }
+}
+
+// Toggle cart modal
+function toggleCart() {
+    console.log('Toggling cart...');
+    const cartModal = document.getElementById('cartModal');
+    if (!cartModal) {
+        console.error('Cart modal not found');
+        return;
+    }
+    
+    cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block';
+    if (cartModal.style.display === 'block') {
+        updateCartDisplay();
+    }
+}
+
+// Update cart display
+function updateCartDisplay() {
+    console.log('Updating cart display...');
+    const cartItems = document.getElementById('cartItems');
+    const cartSubtotal = document.getElementById('cartSubtotal');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartCount = document.getElementById('cartCount');
+    const deliveryFee = 40;
+
+    if (!cartItems) {
+        console.error('Cart items container not found');
+        return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
+    console.log('Cart data for display:', cart);
+    
+    // Calculate total
+    const subtotal = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    console.log('Cart subtotal:', subtotal);
+
+    // Update cart items
+    cartItems.innerHTML = cart.items.map(item => `
+        <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
+            <div class="cart-item-details">
+                <h4>${item.name}</h4>
+                <p>₹${item.price} x ${item.quantity}</p>
+                <div class="cart-item-actions">
+                    <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
+                    <button class="remove-item" onclick="removeFromCart('${item.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="cart-item-total">₹${item.price * item.quantity}</div>
+        </div>
+    `).join('') || '<p class="empty-cart">Your cart is empty</p>';
+
+    // Update totals
+    if (cartSubtotal) cartSubtotal.textContent = `₹${subtotal}`;
+    if (cartTotal) cartTotal.textContent = `₹${subtotal + deliveryFee}`;
+    if (cartCount) cartCount.textContent = cart.items.reduce((count, item) => count + item.quantity, 0);
+}
+
+// Update quantity
+function updateQuantity(productId, newQuantity) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
+    const item = cart.items.find(item => item.id === productId);
+    
+    if (!item) return;
+
+    if (newQuantity <= 0) {
+        removeFromCart(productId);
+    } else {
+        item.quantity = newQuantity;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartDisplay();
+        loadCartData(); // Update order summary as well
+    }
+}
+
+// Remove from cart
+function removeFromCart(productId) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
+    cart.items = cart.items.filter(item => item.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+    loadCartData(); // Update order summary as well
+    showNotification('Item removed from cart', 'success');
+}
+
+// Proceed to checkout
+function proceedToCheckout() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
+    if (cart.items.length === 0) {
+        showNotification('Your cart is empty!', 'error');
+        return;
+    }
+    toggleCart();
 }
 
 // Initialize payment methods
@@ -283,22 +394,99 @@ async function createOrder(billingDetails, paymentMethod) {
     }
 }
 
+// Initialize Razorpay
+async function initializeRazorpay() {
+    try {
+        const amount = document.getElementById('totalAmount').textContent.replace('₹', '');
+        const response = await fetch('/api/payment/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to create payment intent');
+        }
+
+        const order = await response.json();
+        return order;
+    } catch (error) {
+        console.error('Error initializing Razorpay:', error);
+        showError('Failed to initialize payment system. Please try again later.');
+        return null;
+    }
+}
+
 // Handle card payment
 async function handleCardPayment(billingDetails) {
-    const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-            return_url: `${window.location.origin}/order-success.html`,
-            payment_method_data: {
-                billing_details: billingDetails
-            }
-        }
-    });
+    try {
+        const order = await initializeRazorpay();
+        if (!order) return false;
 
-    if (error) {
-        throw new Error(error.message);
+        const options = {
+            key: process.env.RAZORPAY_KEY_ID,
+            amount: order.amount,
+            currency: order.currency,
+            name: 'Bastiramji Mithai Wale',
+            description: 'Sweet Purchase',
+            order_id: order.id,
+            handler: function(response) {
+                verifyPayment(response, billingDetails);
+            },
+            prefill: {
+                name: billingDetails.name,
+                email: billingDetails.email,
+                contact: billingDetails.phone
+            },
+            theme: {
+                color: '#D4AF37'
+            }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+        return true;
+    } catch (error) {
+        console.error('Error processing card payment:', error);
+        showError('Failed to process payment. Please try again.');
+        return false;
     }
-    return true;
+}
+
+// Verify payment
+async function verifyPayment(response, billingDetails) {
+    try {
+        const verifyResponse = await fetch('/api/payment/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+            })
+        });
+
+        if (!verifyResponse.ok) {
+            throw new Error('Payment verification failed');
+        }
+
+        const result = await verifyResponse.json();
+        if (result.success) {
+            // Create order in the system
+            const orderDetails = await createOrder(billingDetails, 'card', response.razorpay_payment_id);
+            if (orderDetails) {
+                showSuccessMessage('Payment successful! Your order has been placed.');
+                // Clear cart and redirect to success page
+                localStorage.removeItem('cart');
+                window.location.href = '/order-success.html';
+            }
+        } else {
+            showError('Payment verification failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error verifying payment:', error);
+        showError('Failed to verify payment. Please contact support.');
+    }
 }
 
 // Handle UPI payment
