@@ -26,6 +26,18 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    deliveryCharges: {
+        type: Number,
+        default: 0
+    },
+    tax: {
+        type: Number,
+        default: 0
+    },
+    finalAmount: {
+        type: Number,
+        required: true
+    },
     shippingAddress: {
         name: String,
         address: String,
@@ -34,6 +46,15 @@ const orderSchema = new mongoose.Schema({
         pincode: String,
         phone: String
     },
+    deliveryDate: {
+        type: Date,
+        required: true
+    },
+    deliveryTimeSlot: {
+        type: String,
+        enum: ['9AM-12PM', '12PM-3PM', '3PM-6PM', '6PM-9PM'],
+        required: true
+    },
     paymentMethod: {
         type: String,
         enum: ['cod', 'online'],
@@ -41,7 +62,7 @@ const orderSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ['pending', 'completed', 'failed'],
+        enum: ['pending', 'completed', 'failed', 'refunded'],
         default: 'pending'
     },
     status: {
@@ -59,6 +80,12 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+});
+
+// Update the updatedAt timestamp before saving
+orderSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
 });
 
 module.exports = mongoose.model('Order', orderSchema); 

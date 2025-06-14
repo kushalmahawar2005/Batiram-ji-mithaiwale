@@ -125,6 +125,7 @@ const products = [
 // Common functionality for all pages
 // Remove cart-related code and keep only shared utilities
 
+
 // Show notification
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');

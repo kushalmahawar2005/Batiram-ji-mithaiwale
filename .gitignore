@@ -54,3 +54,4 @@ logs/
 # Cache
 .cache/
 .temp/ 
+.vercel

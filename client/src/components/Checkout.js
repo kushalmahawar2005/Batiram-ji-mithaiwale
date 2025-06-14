@@ -1,245 +1,197 @@
-import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
-  CardElement,
-  Elements,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js';
+  Box,
+  Typography,
+  Paper,
+  Container,
+  Button,
+  TextField,
+  Grid,
+} from '@mui/material';
+import './Checkout.css';
 
-// Replace with your Stripe publishable key
-const stripePromise = loadStripe('your_publishable_key');
-
-const CheckoutForm = ({ total, items }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [error, setError] = useState(null);
-  const [processing, setProcessing] = useState(false);
-  const [billingDetails, setBillingDetails] = useState({
+const Checkout = ({ total, items }) => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: {
-      line1: '',
-      city: '',
-      state: '',
-      postal_code: '',
-    },
+    address: '',
   });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setProcessing(true);
-
-    if (!stripe || !elements) {
+  useEffect(() => {
+    // Check if user is logged in
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    if (!isLoggedIn) {
+      navigate('/login');
       return;
     }
 
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: elements.getElement(CardElement),
-      billing_details: billingDetails,
-    });
+    // Load Razorpay script
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
 
-    if (error) {
-      setError(error.message);
-      setProcessing(false);
-      return;
-    }
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [navigate]);
 
-    // Here you would typically make a call to your backend to process the payment
-    // and create an order
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePayment = async () => {
     try {
-      // Replace with your backend API endpoint
-      const response = await fetch('/api/create-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          paymentMethodId: paymentMethod.id,
-          amount: total,
-          billingDetails,
-          items,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.error) {
-        setError(result.error);
-      } else {
-        // Handle successful payment
-        window.location.href = '/order-confirmation';
+      // Validate form
+      if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+        toast.error('Please fill all required fields');
+        return;
       }
-    } catch (err) {
-      setError('An error occurred while processing your payment.');
-    }
 
-    setProcessing(false);
+      // Create order on your server (simulated here)
+      const orderId = 'order_' + Math.random().toString(36).substr(2, 9);
+      
+      const options = {
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+        amount: total * 100, // Convert to paise
+        currency: 'INR',
+        name: 'BMW E-Commerce',
+        description: 'Payment for your order',
+        order_id: orderId,
+        handler: function (response) {
+          // Handle successful payment
+          const orderData = {
+            id: orderId,
+            date: new Date().toISOString(),
+            items: items,
+          amount: total,
+            status: 'completed',
+            paymentId: response.razorpay_payment_id,
+            customerDetails: formData,
+          };
+
+          // Save order to localStorage
+          const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+          orders.push(orderData);
+          localStorage.setItem('orders', JSON.stringify(orders));
+
+          toast.success('Payment successful!');
+          navigate('/orders');
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: '#0066B1',
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', function (response) {
+        toast.error('Payment failed: ' + response.error.description);
+      });
+      razorpay.open();
+    } catch (error) {
+      toast.error('Error processing payment: ' + error.message);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="checkout-form">
-      <div className="billing-details">
-        <h3>Billing Details</h3>
-        <div className="form-row">
-          <input
-            type="text"
-            placeholder="Full Name"
+    <Container maxWidth="lg">
+      <Box sx={{ mt: 4, mb: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={3} sx={{ p: 3 }}>
+              <Typography variant="h5" gutterBottom>
+                Order Summary
+              </Typography>
+              {items.map((item) => (
+                <Box key={item.id} sx={{ mb: 2 }}>
+                  <Typography variant="body1">
+                    {item.name} x {item.quantity}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    ₹{item.price.toFixed(2)}
+                  </Typography>
+                </Box>
+              ))}
+              <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+                <Typography variant="h6">
+                  Total: ₹{total.toFixed(2)}
+                </Typography>
+              </Box>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={3} sx={{ p: 3 }}>
+              <Typography variant="h5" gutterBottom>
+                Shipping Details
+              </Typography>
+              <Box component="form" sx={{ mt: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Full Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
             required
-            value={billingDetails.name}
-            onChange={(e) => setBillingDetails({ ...billingDetails, name: e.target.value })}
+                  sx={{ mb: 2 }}
           />
-        </div>
-        <div className="form-row">
-          <input
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
             type="email"
-            placeholder="Email"
+                  value={formData.email}
+                  onChange={handleInputChange}
             required
-            value={billingDetails.email}
-            onChange={(e) => setBillingDetails({ ...billingDetails, email: e.target.value })}
+                  sx={{ mb: 2 }}
           />
-        </div>
-        <div className="form-row">
-          <input
+                <TextField
+                  fullWidth
+                  label="Phone"
+                  name="phone"
             type="tel"
-            placeholder="Phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
             required
-            value={billingDetails.phone}
-            onChange={(e) => setBillingDetails({ ...billingDetails, phone: e.target.value })}
-          />
-        </div>
-        <div className="form-row">
-          <input
-            type="text"
-            placeholder="Address"
+                  sx={{ mb: 2 }}
+                />
+                <TextField
+                  fullWidth
+                  label="Address"
+                  name="address"
+                  multiline
+                  rows={3}
+                  value={formData.address}
+                  onChange={handleInputChange}
             required
-            value={billingDetails.address.line1}
-            onChange={(e) => setBillingDetails({
-              ...billingDetails,
-              address: { ...billingDetails.address, line1: e.target.value }
-            })}
+                  sx={{ mb: 2 }}
           />
-        </div>
-        <div className="form-row three-columns">
-          <input
-            type="text"
-            placeholder="City"
-            required
-            value={billingDetails.address.city}
-            onChange={(e) => setBillingDetails({
-              ...billingDetails,
-              address: { ...billingDetails.address, city: e.target.value }
-            })}
-          />
-          <input
-            type="text"
-            placeholder="State"
-            required
-            value={billingDetails.address.state}
-            onChange={(e) => setBillingDetails({
-              ...billingDetails,
-              address: { ...billingDetails.address, state: e.target.value }
-            })}
-          />
-          <input
-            type="text"
-            placeholder="PIN Code"
-            required
-            value={billingDetails.address.postal_code}
-            onChange={(e) => setBillingDetails({
-              ...billingDetails,
-              address: { ...billingDetails.address, postal_code: e.target.value }
-            })}
-          />
-        </div>
-      </div>
-
-      <div className="payment-details">
-        <h3>Payment Details</h3>
-        <div className="card-element-container">
-          <CardElement
-            options={{
-              style: {
-                base: {
-                  fontSize: '16px',
-                  color: '#333',
-                  '::placeholder': {
-                    color: '#aab7c4',
-                  },
-                },
-              },
-            }}
-          />
-        </div>
-      </div>
-
-      {error && <div className="error-message">{error}</div>}
-
-      <button
-        type="submit"
-        disabled={!stripe || processing}
-        className="pay-button"
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={handlePayment}
+                  size="large"
       >
-        {processing ? 'Processing...' : `Pay ₹${total.toFixed(2)}`}
-      </button>
-
-      <div className="security-badges">
-        <div className="badge">
-          <i className="fas fa-lock"></i>
-          <span>Secure Payment</span>
-        </div>
-        <div className="badge">
-          <i className="fas fa-shield-alt"></i>
-          <span>SSL Encrypted</span>
-        </div>
-      </div>
-    </form>
-  );
-};
-
-const Checkout = ({ total, items }) => {
-  return (
-    <div className="checkout-container">
-      <div className="checkout-content">
-        <div className="order-summary">
-          <h2>Order Summary</h2>
-          <div className="summary-items">
-            {items.map((item) => (
-              <div key={item.id} className="summary-item">
-                <img src={item.image} alt={item.name} />
-                <div className="item-details">
-                  <h4>{item.name}</h4>
-                  <p>Quantity: {item.quantity}</p>
-                  <p className="item-price">₹{item.price.toFixed(2)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="summary-total">
-            <div className="subtotal">
-              <span>Subtotal</span>
-              <span>₹{total.toFixed(2)}</span>
-            </div>
-            <div className="shipping">
-              <span>Shipping</span>
-              <span>Free</span>
-            </div>
-            <div className="total">
-              <span>Total</span>
-              <span>₹{total.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="payment-form">
-          <Elements stripe={stripePromise}>
-            <CheckoutForm total={total} items={items} />
-          </Elements>
-        </div>
-      </div>
-    </div>
+                  Pay ₹{total.toFixed(2)}
+                </Button>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+    </Container>
   );
 };
 

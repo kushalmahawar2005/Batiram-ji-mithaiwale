@@ -1,634 +1,421 @@
-// Initialize Stripe with the test publishable key
-const stripe = Stripe('pk_test_51O5QI5SCk0czZZtPLGpbYXrRB5YgqE0f6EHs5YPKTHHEYhMT5rRkNPWvKE7DtW7YRNHcWJEXvwEGrHO1abvL4Zzk00DqEXFEYH');
-let elements;
-let paymentElement;
+// Payment system initialization
+const payment = {
+    cartData: null,
+    selectedMethod: null,
+    razorpay: null,
+    qrCode: null,
 
-// Load cart data and initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded, initializing...');
-    loadCartData();
-    initializePaymentMethods();
-    initializeStripe();
-});
+    // Initialize payment system
+    init() {
+        this.loadCartData();
+        this.setupEventListeners();
+        this.initializeRazorpay();
+    },
 
 // Load cart data from localStorage
-function loadCartData() {
-    try {
-        console.log('Loading cart data...');
-        const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
-        console.log('Cart data:', cart);
-        
-        const orderItems = document.getElementById('orderItems');
-        const subtotal = document.getElementById('subtotal');
-        const total = document.getElementById('total');
-        const deliveryFee = 40;
+    loadCartData() {
+        try {
+            const cartData = localStorage.getItem('cartData');
+            if (!cartData) {
+                this.showToast('Cart is empty', 'error');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                return;
+            }
 
-        if (!orderItems) {
-            console.error('Order items container not found');
+            this.cartData = JSON.parse(cartData);
+            
+            // Validate cart data structure
+            if (!this.cartData.items || !Array.isArray(this.cartData.items) || this.cartData.items.length === 0) {
+                console.error('Invalid cart data:', this.cartData);
+                this.showToast('Invalid cart data', 'error');
+                setTimeout(() => window.location.href = 'index.html', 2000);
             return;
         }
+
+            // Calculate totals if not present
+            if (!this.cartData.subtotal || !this.cartData.tax || !this.cartData.total) {
+                this.calculateTotals();
+            }
+
+            this.updateOrderSummary();
+        } catch (error) {
+            console.error('Error loading cart data:', error);
+            this.showToast('Error loading cart data', 'error');
+            setTimeout(() => window.location.href = 'index.html', 2000);
+        }
+    },
+
+    // Calculate totals
+    calculateTotals() {
+        this.cartData.subtotal = this.cartData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        this.cartData.tax = this.cartData.subtotal * 0.18; // 18% GST
+        this.cartData.total = this.cartData.subtotal + this.cartData.tax;
+    },
+
+    // Update order summary display
+    updateOrderSummary() {
+        try {
+            const orderItems = document.getElementById('order-items');
+            const subtotalEl = document.getElementById('subtotal');
+            const taxEl = document.getElementById('tax');
+            const totalEl = document.getElementById('total');
+
+            if (!orderItems || !subtotalEl || !taxEl || !totalEl) {
+                throw new Error('Required elements not found');
+            }
 
         // Clear existing items
         orderItems.innerHTML = '';
 
-        // Add each item to the summary
-        cart.items.forEach(item => {
-            console.log('Processing item:', item);
-            const itemElement = document.createElement('div');
-            itemElement.className = 'order-item';
-            itemElement.innerHTML = `
-                <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
+            // Add items to summary
+            this.cartData.items.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'order-item';
+                itemEl.innerHTML = `
+                    <img src="${item.image}" alt="${item.title}" onerror="this.src='images/placeholder.jpg'">
                 <div class="order-item-details">
-                    <h4>${item.name}</h4>
+                        <h4>${item.title}</h4>
                     <p>₹${item.price} x ${item.quantity}</p>
                 </div>
-                <div class="item-price">₹${item.price * item.quantity}</div>
+                    <div class="item-total">₹${(item.price * item.quantity).toFixed(2)}</div>
             `;
-            orderItems.appendChild(itemElement);
+                orderItems.appendChild(itemEl);
         });
 
         // Update totals
-        const subtotalAmount = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        console.log('Subtotal:', subtotalAmount);
+            subtotalEl.textContent = `₹${this.cartData.subtotal.toFixed(2)}`;
+            taxEl.textContent = `₹${this.cartData.tax.toFixed(2)}`;
+            totalEl.textContent = `₹${this.cartData.total.toFixed(2)}`;
         
-        if (subtotal) subtotal.textContent = `₹${subtotalAmount}`;
-        if (total) total.textContent = `₹${subtotalAmount + deliveryFee}`;
+            // Store total amount for order confirmation
+            localStorage.setItem('totalAmount', `₹${this.cartData.total.toFixed(2)}`);
     } catch (error) {
-        console.error('Error loading cart data:', error);
-        showError('Failed to load cart data. Please try again.');
-    }
-}
+            console.error('Error updating order summary:', error);
+            this.showToast('Error updating order summary', 'error');
+        }
+    },
 
-// Toggle cart modal
-function toggleCart() {
-    console.log('Toggling cart...');
-    const cartModal = document.getElementById('cartModal');
-    if (!cartModal) {
-        console.error('Cart modal not found');
+    // Setup event listeners
+    setupEventListeners() {
+        try {
+            // Payment method selection
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', () => this.selectPaymentMethod(method.dataset.method));
+            });
+
+            // Place order button
+            const placeOrderBtn = document.getElementById('place-order');
+            if (placeOrderBtn) {
+                placeOrderBtn.addEventListener('click', () => this.handlePlaceOrder());
+            }
+
+            // Form validation
+            const paymentForm = document.getElementById('payment-form');
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handlePlaceOrder();
+                });
+            }
+        } catch (error) {
+            console.error('Error setting up event listeners:', error);
+            this.showToast('Error setting up payment system', 'error');
+        }
+    },
+
+    // Select payment method
+    selectPaymentMethod(method) {
+        try {
+            this.selectedMethod = method;
+            
+            // Store payment method for order confirmation
+            localStorage.setItem('paymentMethod', method === 'card' ? 'Card Payment' : 
+                method === 'upi' ? 'UPI Payment' : 'Cash on Delivery');
+            
+            // Update UI
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.toggle('selected', el.dataset.method === method);
+            });
+
+            // Show/hide payment sections
+            const sections = {
+                'card': document.getElementById('card-payment'),
+                'upi': document.getElementById('upi-payment'),
+                'cod': document.getElementById('cod-payment')
+            };
+
+            Object.entries(sections).forEach(([key, section]) => {
+                if (section) {
+                    section.style.display = key === method ? 'block' : 'none';
+                }
+            });
+
+            // Generate UPI QR code if UPI selected
+            if (method === 'upi') {
+                this.generateUPIQR();
+            }
+        } catch (error) {
+            console.error('Error selecting payment method:', error);
+            this.showToast('Error selecting payment method', 'error');
+        }
+    },
+
+    // Initialize Razorpay
+    initializeRazorpay() {
+        try {
+            this.razorpay = new Razorpay({
+                key: 'rzp_test_YOUR_KEY_HERE', // Replace with your Razorpay key
+                currency: 'INR',
+                name: 'Bastiramji Mithai Wale',
+                description: 'Payment for your order',
+                handler: (response) => this.handlePaymentSuccess(response),
+                prefill: {
+                    name: document.getElementById('name')?.value || '',
+                    email: document.getElementById('email')?.value || '',
+                    contact: document.getElementById('phone')?.value || ''
+                },
+                theme: {
+                    color: '#8B0000'
+                }
+            });
+        } catch (error) {
+            console.error('Error initializing Razorpay:', error);
+            this.showToast('Error initializing payment gateway', 'error');
+        }
+    },
+
+    // Generate UPI QR code
+    generateUPIQR() {
+        try {
+            const qrContainer = document.getElementById('qr-code');
+            if (!qrContainer) return;
+
+            qrContainer.innerHTML = '';
+            
+            if (this.qrCode) {
+                this.qrCode.clear();
+            }
+
+            const upiId = document.getElementById('upi-id')?.value || 'example@upi';
+            const amount = this.cartData.total;
+            
+            this.qrCode = new QRCode(qrContainer, {
+                text: `upi://pay?pa=${upiId}&pn=Bastiramji Mithai Wale&am=${amount}`,
+                width: 200,
+                height: 200
+            });
+        } catch (error) {
+            console.error('Error generating UPI QR code:', error);
+            this.showToast('Error generating UPI QR code', 'error');
+        }
+    },
+
+    // Handle place order
+    handlePlaceOrder() {
+        try {
+            if (!this.validateForm()) {
         return;
     }
-    
-    cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block';
-    if (cartModal.style.display === 'block') {
-        updateCartDisplay();
-    }
-}
 
-// Update cart display
-function updateCartDisplay() {
-    console.log('Updating cart display...');
-    const cartItems = document.getElementById('cartItems');
-    const cartSubtotal = document.getElementById('cartSubtotal');
-    const cartTotal = document.getElementById('cartTotal');
-    const cartCount = document.getElementById('cartCount');
-    const deliveryFee = 40;
+            const button = document.getElementById('place-order');
+            if (!button) return;
 
-    if (!cartItems) {
-        console.error('Cart items container not found');
-        return;
-    }
+            button.disabled = true;
+            button.textContent = 'Processing...';
 
-    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
-    console.log('Cart data for display:', cart);
-    
-    // Calculate total
-    const subtotal = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-    console.log('Cart subtotal:', subtotal);
-
-    // Update cart items
-    cartItems.innerHTML = cart.items.map(item => `
-        <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
-            <div class="cart-item-details">
-                <h4>${item.name}</h4>
-                <p>₹${item.price} x ${item.quantity}</p>
-                <div class="cart-item-actions">
-                    <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
-                    <span>${item.quantity}</span>
-                    <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
-                    <button class="remove-item" onclick="removeFromCart('${item.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="cart-item-total">₹${item.price * item.quantity}</div>
-        </div>
-    `).join('') || '<p class="empty-cart">Your cart is empty</p>';
-
-    // Update totals
-    if (cartSubtotal) cartSubtotal.textContent = `₹${subtotal}`;
-    if (cartTotal) cartTotal.textContent = `₹${subtotal + deliveryFee}`;
-    if (cartCount) cartCount.textContent = cart.items.reduce((count, item) => count + item.quantity, 0);
-}
-
-// Update quantity
-function updateQuantity(productId, newQuantity) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
-    const item = cart.items.find(item => item.id === productId);
-    
-    if (!item) return;
-
-    if (newQuantity <= 0) {
-        removeFromCart(productId);
-    } else {
-        item.quantity = newQuantity;
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartDisplay();
-        loadCartData(); // Update order summary as well
-    }
-}
-
-// Remove from cart
-function removeFromCart(productId) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
-    cart.items = cart.items.filter(item => item.id !== productId);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartDisplay();
-    loadCartData(); // Update order summary as well
-    showNotification('Item removed from cart', 'success');
-}
-
-// Proceed to checkout
-function proceedToCheckout() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
-    if (cart.items.length === 0) {
-        showNotification('Your cart is empty!', 'error');
-        return;
-    }
-    toggleCart();
-}
-
-// Initialize payment methods
-function initializePaymentMethods() {
-    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
-    const cardSection = document.getElementById('card-payment-section');
-    const upiSection = document.getElementById('upi-payment-section');
-    const submitButton = document.getElementById('submit-button');
-
-    paymentMethods.forEach(method => {
-        method.addEventListener('change', (e) => {
-            switch(e.target.value) {
+            switch (this.selectedMethod) {
                 case 'card':
-                    cardSection.style.display = 'block';
-                    upiSection.style.display = 'none';
-                    submitButton.textContent = 'Pay with Card';
+                    this.processCardPayment();
                     break;
                 case 'upi':
-                    cardSection.style.display = 'none';
-                    upiSection.style.display = 'block';
-                    submitButton.textContent = 'Pay with UPI';
-                    generateUPIQRCode();
+                    this.processUPIPayment();
                     break;
                 case 'cod':
-                    cardSection.style.display = 'none';
-                    upiSection.style.display = 'none';
-                    submitButton.textContent = 'Place Order (Cash on Delivery)';
+                    this.processCODPayment();
                     break;
+                default:
+                    this.showToast('Please select a payment method', 'error');
+                    button.disabled = false;
+                    button.textContent = 'Place Order';
             }
-        });
-    });
-}
-
-// Initialize Stripe elements
-async function initializeStripe() {
-    try {
-        const amount = document.getElementById('totalAmount').textContent.replace('₹', '');
-        const response = await fetch('/api/create-payment-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to create payment intent');
-        }
-
-        const { clientSecret } = await response.json();
-
-        const appearance = {
-            theme: 'stripe',
-            variables: {
-                colorPrimary: '#D4AF37',
-                colorBackground: '#FFF8DC',
-                colorText: '#333333',
-                colorDanger: '#8B0000',
-                fontFamily: 'Poppins, sans-serif',
+        } catch (error) {
+            console.error('Error placing order:', error);
+            this.showToast('Error placing order', 'error');
+            const button = document.getElementById('place-order');
+            if (button) {
+                button.disabled = false;
+                button.textContent = 'Place Order';
             }
-        };
-
-        elements = stripe.elements({ appearance, clientSecret });
-        paymentElement = elements.create('payment');
-        paymentElement.mount('#payment-element');
-    } catch (error) {
-        console.error('Error initializing Stripe:', error);
-        showError('Failed to initialize payment system. Please try again later.');
-    }
-}
-
-// Generate UPI QR Code
-function generateUPIQRCode() {
-    const amount = document.getElementById('totalAmount').textContent.replace('₹', '');
-    const upiId = 'your-upi-id@bank'; // Replace with your actual UPI ID
-    const merchantName = 'Bastiramji Mithai Wale';
-    const transactionNote = 'Sweet Purchase';
-    
-    // Generate UPI URL
-    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&tn=${encodeURIComponent(transactionNote)}`;
-    
-    // Generate QR code (you'll need to implement this based on your QR library)
-    // For example, using QRCode.js:
-    const qrCode = document.getElementById('upi-qr-code');
-    if (window.QRCode) {
-        new QRCode(qrCode, {
-            text: upiUrl,
-            width: 200,
-            height: 200
-        });
-    }
-}
-
-// Send confirmation notifications
-async function sendConfirmationNotifications(orderDetails) {
-    try {
-        const response = await fetch('/api/send-confirmations', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: orderDetails.billingDetails.email,
-                phone: orderDetails.billingDetails.phone,
-                orderId: orderDetails.orderId,
-                amount: orderDetails.total,
-                items: orderDetails.items,
-                shippingAddress: orderDetails.billingDetails.address
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to send confirmation notifications');
         }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Error sending confirmations:', error);
-        throw new Error('Failed to send confirmation messages');
-    }
-}
-
-// Handle form submission
-const form = document.getElementById('payment-form');
-form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-    
-    const submitButton = document.getElementById('submit-button');
-    const spinner = document.getElementById('spinner');
-    const buttonText = document.getElementById('button-text');
+    },
     
     // Validate form
-    if (!validateForm()) {
-        return;
-    }
+    validateForm() {
+        try {
+            const requiredFields = ['name', 'email', 'phone', 'address', 'city', 'pincode'];
+            const missingFields = requiredFields.filter(field => {
+                const element = document.getElementById(field);
+                return !element || !element.value.trim();
+            });
 
-    // Check terms and conditions
-    if (!document.getElementById('terms').checked) {
-        showError('Please accept the terms and conditions to proceed.');
-        return;
-    }
-    
-    // Disable the submit button and show spinner
-    submitButton.disabled = true;
-    spinner.classList.remove('hidden');
-    buttonText.classList.add('hidden');
+            if (missingFields.length > 0) {
+                this.showToast(`Please fill in: ${missingFields.join(', ')}`, 'error');
+                return false;
+            }
 
-    const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-    
-    try {
-        // Show processing message
-        showProcessingMessage('Processing your payment...');
-        
-        // Collect billing details
-        const billingDetails = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            address: {
-                line1: document.getElementById('address').value,
-                city: document.getElementById('city').value,
-                state: document.getElementById('state').value,
-                postal_code: document.getElementById('pincode').value,
-            },
-            notes: document.getElementById('notes').value
-        };
+            if (!this.selectedMethod) {
+                this.showToast('Please select a payment method', 'error');
+                return false;
+            }
 
-        let success = false;
-        let orderDetails = null;
+            // Validate email format
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                this.showToast('Please enter a valid email address', 'error');
+                return false;
+            }
 
-        switch(paymentMethod) {
-            case 'card':
-                buttonText.textContent = 'Processing Card Payment...';
-                success = await handleCardPayment(billingDetails);
-                if (success) {
-                    orderDetails = await createOrder(billingDetails, 'card');
-                }
-                break;
-            case 'upi':
-                buttonText.textContent = 'Confirming UPI Payment...';
-                success = await handleUPIPayment(billingDetails);
-                if (success) {
-                    orderDetails = await createOrder(billingDetails, 'upi');
-                }
-                break;
-            case 'cod':
-                buttonText.textContent = 'Confirming Order...';
-                success = await handleCODPayment(billingDetails);
-                if (success) {
-                    orderDetails = await createOrder(billingDetails, 'cod');
-                }
-                break;
-        }
+            // Validate phone number
+            const phone = document.getElementById('phone').value;
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phone)) {
+                this.showToast('Please enter a valid 10-digit phone number', 'error');
+                return false;
+            }
 
-        if (success && orderDetails) {
-            // Send confirmation notifications
-            await sendConfirmationNotifications(orderDetails);
-            
-            showSuccessMessage('Order confirmed! Check your email and phone for confirmation.');
-            // Clear cart and redirect to success page
-            localStorage.removeItem('cart');
-            setTimeout(() => {
-                window.location.href = '/order-success.html';
-            }, 2000);
-        }
-    } catch (error) {
-        showError(error.message);
-        buttonText.textContent = 'Try Again';
-    } finally {
-        // Re-enable the submit button and hide spinner
-        submitButton.disabled = false;
-        spinner.classList.add('hidden');
-        buttonText.classList.remove('hidden');
-    }
-});
+            // Validate pincode
+            const pincode = document.getElementById('pincode').value;
+            const pincodeRegex = /^\d{6}$/;
+            if (!pincodeRegex.test(pincode)) {
+                this.showToast('Please enter a valid 6-digit pincode', 'error');
+                return false;
+            }
 
-// Create order in the system
-async function createOrder(billingDetails, paymentMethod) {
-    try {
-        const response = await fetch('/api/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                billingDetails,
-                items: JSON.parse(localStorage.getItem('cart')),
-                total: document.getElementById('totalAmount').textContent.replace('₹', ''),
-                paymentMethod,
-                orderDate: new Date().toISOString()
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to create order');
-        }
-
-        return await response.json();
+            return true;
         } catch (error) {
-        console.error('Error creating order:', error);
-        throw new Error('Failed to create order. Please try again.');
-    }
-}
-
-// Initialize Razorpay
-async function initializeRazorpay() {
-    try {
-        const amount = document.getElementById('totalAmount').textContent.replace('₹', '');
-        const response = await fetch('/api/payment/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to create payment intent');
+            console.error('Error validating form:', error);
+            this.showToast('Error validating form', 'error');
+            return false;
         }
+    },
 
-        const order = await response.json();
-        return order;
-    } catch (error) {
-        console.error('Error initializing Razorpay:', error);
-        showError('Failed to initialize payment system. Please try again later.');
-        return null;
-    }
-}
-
-// Handle card payment
-async function handleCardPayment(billingDetails) {
-    try {
-        const order = await initializeRazorpay();
-        if (!order) return false;
-
+    // Process card payment
+    processCardPayment() {
+        try {
         const options = {
-            key: process.env.RAZORPAY_KEY_ID,
-            amount: order.amount,
-            currency: order.currency,
+                amount: Math.round(this.cartData.total * 100), // Convert to paise
+                currency: 'INR',
             name: 'Bastiramji Mithai Wale',
-            description: 'Sweet Purchase',
-            order_id: order.id,
-            handler: function(response) {
-                verifyPayment(response, billingDetails);
-            },
+                description: 'Payment for your order',
+                handler: (response) => this.handlePaymentSuccess(response),
             prefill: {
-                name: billingDetails.name,
-                email: billingDetails.email,
-                contact: billingDetails.phone
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    contact: document.getElementById('phone').value
             },
             theme: {
-                color: '#D4AF37'
+                    color: '#8B0000'
             }
         };
 
-        const rzp = new Razorpay(options);
-        rzp.open();
-        return true;
+            this.razorpay.open(options);
     } catch (error) {
         console.error('Error processing card payment:', error);
-        showError('Failed to process payment. Please try again.');
-        return false;
-    }
-}
-
-// Verify payment
-async function verifyPayment(response, billingDetails) {
-    try {
-        const verifyResponse = await fetch('/api/payment/verify-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature
-            })
-        });
-
-        if (!verifyResponse.ok) {
-            throw new Error('Payment verification failed');
-        }
-
-        const result = await verifyResponse.json();
-        if (result.success) {
-            // Create order in the system
-            const orderDetails = await createOrder(billingDetails, 'card', response.razorpay_payment_id);
-            if (orderDetails) {
-                showSuccessMessage('Payment successful! Your order has been placed.');
-                // Clear cart and redirect to success page
-                localStorage.removeItem('cart');
-                window.location.href = '/order-success.html';
+            this.showToast('Error processing card payment', 'error');
+            const button = document.getElementById('place-order');
+            if (button) {
+                button.disabled = false;
+                button.textContent = 'Place Order';
             }
-        } else {
-            showError('Payment verification failed. Please try again.');
         }
+    },
+
+    // Process UPI payment
+    processUPIPayment() {
+        try {
+            const upiId = document.getElementById('upi-id').value;
+            if (!upiId) {
+                this.showToast('Please enter UPI ID', 'error');
+                return;
+            }
+
+            // Simulate UPI payment success
+            setTimeout(() => {
+                this.handlePaymentSuccess({ payment_id: 'upi_' + Date.now() });
+            }, 2000);
+        } catch (error) {
+            console.error('Error processing UPI payment:', error);
+            this.showToast('Error processing UPI payment', 'error');
+            const button = document.getElementById('place-order');
+            if (button) {
+                button.disabled = false;
+                button.textContent = 'Place Order';
+            }
+        }
+    },
+
+    // Process COD payment
+    processCODPayment() {
+        try {
+            // Simulate COD order placement
+            setTimeout(() => {
+                this.handlePaymentSuccess({ payment_id: 'cod_' + Date.now() });
+            }, 1000);
     } catch (error) {
-        console.error('Error verifying payment:', error);
-        showError('Failed to verify payment. Please contact support.');
-    }
-}
-
-// Handle UPI payment
-async function handleUPIPayment(billingDetails) {
-    try {
-        const response = await fetch('/api/verify-upi-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                amount: document.getElementById('totalAmount').textContent.replace('₹', ''),
-                upiId: document.getElementById('upi_id').value,
-                billingDetails
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('UPI payment verification failed');
+            console.error('Error processing COD payment:', error);
+            this.showToast('Error processing COD payment', 'error');
+            const button = document.getElementById('place-order');
+            if (button) {
+                button.disabled = false;
+                button.textContent = 'Place Order';
+            }
         }
+    },
 
-        return true;
+    // Handle payment success
+    handlePaymentSuccess(response) {
+        try {
+            // Store payment details
+            localStorage.setItem('lastPaymentId', response.payment_id);
+            
+            // Clear cart data from localStorage
+            localStorage.removeItem('cartData');
+            
+            // Clear cart in CartManager if it exists
+            if (typeof cartManager !== 'undefined') {
+                cartManager.clearCart();
+            }
+            
+            // Show success message
+            this.showToast('Payment successful! Redirecting to order confirmation...', 'success');
+            
+            // Redirect to order confirmation
+            setTimeout(() => {
+                window.location.href = 'order-confirmation.html';
+            }, 2000);
+        } catch (error) {
+            console.error('Error handling payment success:', error);
+            this.showToast('Error processing payment success', 'error');
+        }
+    },
+
+    // Show toast message
+    showToast(message, type = 'info') {
+        try {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
     } catch (error) {
-        console.error('Error verifying UPI payment:', error);
-        throw new Error('Failed to verify UPI payment. Please try again.');
-    }
-}
-
-// Handle Cash on Delivery
-async function handleCODPayment(billingDetails) {
-    try {
-        const response = await fetch('/api/create-cod-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                billingDetails,
-                items: JSON.parse(localStorage.getItem('cart')),
-                total: document.getElementById('totalAmount').textContent.replace('₹', '')
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to create COD order');
+            console.error('Error showing toast:', error);
         }
-
-        return true;
-    } catch (error) {
-        console.error('Error creating COD order:', error);
-        throw new Error('Failed to place order. Please try again.');
     }
-}
+};
 
-// Form validation function
-function validateForm() {
-    const requiredFields = ['name', 'email', 'phone', 'address', 'city', 'state', 'pincode'];
-    let isValid = true;
-
-    requiredFields.forEach(field => {
-        const element = document.getElementById(field);
-        if (!element.value.trim()) {
-            showError(`Please fill in the ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
-            element.focus();
-            isValid = false;
-        }
-    });
-
-    // Validate email format
-    const email = document.getElementById('email').value;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        showError('Please enter a valid email address');
-        document.getElementById('email').focus();
-        isValid = false;
-    }
-
-    // Validate phone number (10 digits)
-    const phone = document.getElementById('phone').value;
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(phone)) {
-        showError('Please enter a valid 10-digit phone number');
-        document.getElementById('phone').focus();
-        isValid = false;
-    }
-
-    // Validate PIN code (6 digits)
-    const pincode = document.getElementById('pincode').value;
-    const pincodeRegex = /^\d{6}$/;
-    if (!pincodeRegex.test(pincode)) {
-        showError('Please enter a valid 6-digit PIN code');
-        document.getElementById('pincode').focus();
-        isValid = false;
-    }
-
-    return isValid;
-}
-
-// Show processing message
-function showProcessingMessage(message) {
-    const messageDiv = document.getElementById('payment-message');
-    messageDiv.textContent = message;
-    messageDiv.style.display = 'block';
-    messageDiv.style.color = '#D4AF37';
-    messageDiv.style.backgroundColor = '#FFF8DC';
-}
-
-// Show success message
-function showSuccessMessage(message) {
-    const messageDiv = document.getElementById('payment-message');
-    messageDiv.textContent = message;
-    messageDiv.style.display = 'block';
-    messageDiv.style.color = '#008000';
-    messageDiv.style.backgroundColor = '#E8F5E9';
-}
-
-// Show error message (enhanced)
-function showError(message) {
-    const messageDiv = document.getElementById('payment-message');
-    messageDiv.textContent = message;
-    messageDiv.style.display = 'block';
-    messageDiv.style.color = '#DC3545';
-    messageDiv.style.backgroundColor = '#FFF3F4';
-    setTimeout(() => {
-        messageDiv.style.display = 'none';
-    }, 5000);
-}
-
-// Add some additional styles for the spinner
-const style = document.createElement('style');
-style.textContent = `
-    .spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: #ffffff;
-        animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    .hidden {
-        display: none;
-    }
-`; 
+// Initialize payment system when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => payment.init()); 

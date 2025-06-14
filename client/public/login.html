@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Bastiramji Mithai Wale</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 120px auto;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header img {
+            height: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .login-header h1 {
+            color: var(--primary-color);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .login-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #6b0000;
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .otp-section {
+            display: none;
+        }
+
+        .otp-section.show {
+            display: block;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .otp-inputs input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .otp-inputs input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .resend-otp {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .resend-otp button {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .resend-otp button:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .back-to-phone {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .back-to-phone button {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 100px 1rem;
+                padding: 1.5rem;
+            }
+
+            .login-header img {
+                height: 60px;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="images/logo/bmw-logo.jpg" alt="BMW Logo">
+                <div class="logo-text">
+                    <h1>BMW E-Commerce</h1>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="sweets.html">Products</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="login-container">
+        <div class="login-header">
+            <img src="images/logo/bmw-logo.jpg" alt="BMW Logo">
+            <h1>Welcome Back</h1>
+            <p>Please login to continue</p>
+        </div>
+
+        <form class="login-form" id="loginForm">
+            <div class="phone-section">
+                <div class="form-group">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required pattern="[0-9]{10}">
+                </div>
+                <button type="submit" class="login-btn" id="sendOtpBtn">Send OTP</button>
+            </div>
+
+            <div class="otp-section" id="otpSection">
+                <div class="otp-inputs">
+                    <input type="text" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" maxlength="1" pattern="[0-9]" required>
+                </div>
+                <button type="submit" class="login-btn" id="verifyOtpBtn">Verify OTP</button>
+                <div class="resend-otp">
+                    <button type="button" id="resendOtpBtn" disabled>Resend OTP in <span id="timer">30</span>s</button>
+                </div>
+                <div class="back-to-phone">
+                    <button type="button" id="backToPhoneBtn">Change Phone Number</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const phoneSection = document.querySelector('.phone-section');
+            const otpSection = document.getElementById('otpSection');
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+            const resendOtpBtn = document.getElementById('resendOtpBtn');
+            const backToPhoneBtn = document.getElementById('backToPhoneBtn');
+            const phoneInput = document.getElementById('phone');
+            const otpInputs = document.querySelectorAll('.otp-inputs input');
+            let timerInterval;
+
+            // Handle OTP input
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('keyup', (e) => {
+                    if (e.key >= 0 && e.key <= 9) {
+                        if (index < otpInputs.length - 1) {
+                            otpInputs[index + 1].focus();
+                        }
+                    } else if (e.key === 'Backspace') {
+                        if (index > 0) {
+                            otpInputs[index - 1].focus();
+                        }
+                    }
+                });
+            });
+
+            // Start timer for resend OTP
+            function startTimer() {
+                let timeLeft = 30;
+                resendOtpBtn.disabled = true;
+                document.getElementById('timer').textContent = timeLeft;
+
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timer').textContent = timeLeft;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        resendOtpBtn.disabled = false;
+                        document.getElementById('timer').textContent = '';
+                    }
+                }, 1000);
+            }
+
+            // Handle send OTP
+            sendOtpBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (phoneInput.checkValidity()) {
+                    // Simulate OTP sending
+                    phoneSection.style.display = 'none';
+                    otpSection.classList.add('show');
+                    startTimer();
+                }
+            });
+
+            // Handle verify OTP
+            verifyOtpBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const otp = Array.from(otpInputs).map(input => input.value).join('');
+                if (otp.length === 6) {
+                    // Simulate OTP verification
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userPhone', phoneInput.value);
+                    window.location.href = 'checkout.html';
+                }
+            });
+
+            // Handle resend OTP
+            resendOtpBtn.addEventListener('click', () => {
+                startTimer();
+            });
+
+            // Handle back to phone
+            backToPhoneBtn.addEventListener('click', () => {
+                otpSection.classList.remove('show');
+                phoneSection.style.display = 'block';
+                clearInterval(timerInterval);
+                resendOtpBtn.disabled = false;
+                document.getElementById('timer').textContent = '';
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -3,12 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bastiramji Mithai Wale - Traditional Indian Sweets</title>
+    <meta name="description" content="Bastiramji Mithai Wale - Traditional Indian Sweets Shop. Experience authentic taste of premium sweets and namkeen since 2002.">
+    <meta name="keywords" content="Indian sweets, traditional sweets, mithai, namkeen, Bastiramji, Rajasthan sweets, online sweet shop">
+    <meta name="author" content="Bastiramji Mithai Wale">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bastiramji.com/">
+    <meta property="og:title" content="Bastiramji Mithai Wale - Traditional Indian Sweets">
+    <meta property="og:description" content="Experience the authentic taste of traditional Indian sweets and namkeen.">
+    <meta property="og:image" content="images/logo/bmw-logo.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://bastiramji.com/">
+    <meta property="twitter:title" content="Bastiramji Mithai Wale - Traditional Indian Sweets">
+    <meta property="twitter:description" content="Experience the authentic taste of traditional Indian sweets and namkeen.">
+    <meta property="twitter:image" content="images/logo/bmw-logo.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" as="style">
+    <link rel="preload" href="images/logo/bmw-logo.jpg" as="image">
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css">
+    <link rel="stylesheet" href="css/cart.css">
+
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR-GA-ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'YOUR-GA-ID');
+    </script>
+
+    <title>Bastiramji Mithai Wale - Traditional Indian Sweets</title>
+
+    <style>
+        /* Image Optimization */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .lazy-image.loaded {
+            opacity: 1;
+        }
+
+        /* Add loading placeholder */
+        .image-placeholder {
+            background: #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-placeholder::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                left: 100%;
+            }
+        }
+    </style>
+
+    <script>
+        // Lazy Loading Images
+        document.addEventListener("DOMContentLoaded", function() {
+            const lazyImages = document.querySelectorAll("img[data-src]");
+            
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.add("loaded");
+                        observer.unobserve(img);
+                    }
+                });
+            });
+
+            lazyImages.forEach(img => {
+                // Add placeholder
+                img.classList.add("lazy-image", "image-placeholder");
+                imageObserver.observe(img);
+            });
+        });
+
+        // Add alt text to all images
+        document.querySelectorAll('img').forEach(img => {
+            if (!img.alt) {
+                img.alt = 'Bastiramji Mithai Wale - Traditional Indian Sweets';
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- Special Offers Banner -->
@@ -19,29 +146,33 @@
     <!-- Header Section -->
     <header class="header">
         <nav class="navbar">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="logo">
-                <img src="images/logo/bmw-logo.jpg" 
-                     alt="Bastiram Ji Mithai Wale Logo" 
-                     onerror="this.src='images/placeholder.jpg'">
+                <img src="images/logo/bmw-logo.jpg" alt="BMW Logo">
                 <div class="logo-text">
-                    <h1>Bastiram Ji Mithai Wale</h1>
-                    <p>Since 2002</p>
+                    <h1>Bastiramji Mithai Wale</h1>
                 </div>
             </div>
             <div class="search-bar">
-                <input type="text" id="productSearch" placeholder="Search sweets...">
-                <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+                <input type="text" placeholder="Search products...">
+                <button><i class="fas fa-search"></i></button>
             </div>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
-                <li><a href="sweets.html">Our Sweets</a></li>
-                <li><a href="#owners-section">About Us</a></li>
-                <li><a href="#locations">Locations</a></li>
+                <li><a href="sweets.html">Products</a></li>
+                <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
+            <div class="nav-icons">
+                <a href="login.html" class="login-icon">
+                    <i class="fas fa-user"></i>
+                </a>
             <div class="cart-icon" onclick="toggleCart()">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count">0</span>
+                </div>
             </div>
         </nav>
     </header>
@@ -385,6 +516,228 @@
                 grid-template-columns: 1fr; /* 1 column on mobile */
             }
         }
+
+        /* Mobile Menu Styles */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #333;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                transition: 0.3s ease;
+                z-index: 1000;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-links li {
+                margin: 1rem 0;
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-links a {
+                font-size: 1.2rem;
+                padding: 0.8rem 1.5rem;
+                display: block;
+                width: 100%;
+            }
+
+            .navbar {
+                padding: 1rem;
+                position: relative;
+            }
+
+            .search-bar {
+                display: none;
+            }
+
+            .nav-icons {
+                margin-left: auto;
+            }
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text h1 {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-left: auto;
+        }
+
+        .nav-icons a, .nav-icons div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+        }
+
+        .nav-icons i {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.5rem;
+                justify-content: flex-start;
+            }
+
+            .logo {
+                margin-right: auto;
+            }
+
+            .logo img {
+                height: 35px;
+            }
+
+            .logo-text h1 {
+                font-size: 1rem;
+            }
+
+            .nav-icons {
+                gap: 0.5rem;
+                margin-left: auto;
+            }
+
+            .nav-icons a, .nav-icons div {
+                width: 32px;
+                height: 32px;
+            }
+
+            .nav-icons i {
+                font-size: 1.1rem;
+            }
+
+            .cart-count {
+                font-size: 0.6rem;
+                padding: 1px 4px;
+                min-width: 16px;
+                height: 16px;
+            }
+
+            .mobile-menu-btn {
+                padding: 0.3rem;
+                font-size: 1.2rem;
+                margin-right: 0.5rem;
+            }
+
+            body {
+                padding-top: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-text h1 {
+                font-size: 0.9rem;
+            }
+
+            .logo img {
+                height: 30px;
+            }
+
+            .nav-icons a, .nav-icons div {
+                width: 30px;
+                height: 30px;
+            }
+
+            .nav-icons i {
+                font-size: 1rem;
+            }
+
+            .cart-count {
+                font-size: 0.5rem;
+                padding: 1px 3px;
+                min-width: 14px;
+                height: 14px;
+            }
+
+            .mobile-menu-btn {
+                font-size: 1.1rem;
+            }
+
+            body {
+                padding-top: 55px;
+            }
+        }
     </style>
 
     <!-- Shopping Cart Modal -->
@@ -392,17 +745,31 @@
         <div class="cart-content">
             <div class="cart-header">
                 <h2>Your Cart</h2>
-                <button class="close-cart" onclick="toggleCart()">&times;</button>
+                <button class="close-cart" id="closeCart">&times;</button>
             </div>
             <div class="cart-items" id="cartItems">
                 <!-- Cart items will be dynamically added here -->
             </div>
-            <div class="cart-total">
-                <h3>Total: <span id="cartTotal">₹0</span></h3>
-                <button class="checkout-btn" onclick="initializeCheckout()">Proceed to Checkout</button>
+            <div class="cart-summary">
+                <div class="subtotal">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">$0.00</span>
+                </div>
+                <div class="tax">
+                    <span>Tax:</span>
+                    <span id="cartTax">$0.00</span>
+                </div>
+                <div class="total">
+                    <span>Total:</span>
+                    <span id="cartTotal">$0.00</span>
+                </div>
+                <button class="checkout-btn" id="checkoutBtn" disabled>Proceed to Checkout</button>
             </div>
         </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
@@ -1882,16 +2249,36 @@
             const galleryGrid = document.getElementById('galleryGrid');
             const currentItems = galleryGrid.children.length;
             const itemsToAdd = 6; // Number of new items to add
+            const maxItems = 25; // Maximum total number of photos
 
-            for (let i = 1; i <= itemsToAdd; i++) {
+            // Check if we've reached the maximum limit
+            if (currentItems >= maxItems) {
+                showToast('No more photos available!');
+                return;
+            }
+
+            // Calculate how many more items we can add
+            const remainingItems = maxItems - currentItems;
+            const actualItemsToAdd = Math.min(itemsToAdd, remainingItems);
+
+            for (let i = 1; i <= actualItemsToAdd; i++) {
                 const newItem = document.createElement('div');
                 newItem.className = 'gallery-item';
+                const photoNumber = currentItems + i;
                 newItem.innerHTML = `
-                    <img src="images/shop/shop${currentItems + i}.jpg" 
-                         alt="Shop Photo ${currentItems + i}" 
-                         onerror="this.src='https://picsum.photos/400/${500 + (i * 100)}?random=${currentItems + i}'">
+                    <img src="images/shop/shop${photoNumber}.jpg" 
+                         alt="Shop Photo ${photoNumber}" 
+                         onerror="this.src='images/shop/placeholder.jpg'">
                 `;
                 galleryGrid.appendChild(newItem);
+            }
+
+            // If we've reached the maximum, hide the "View More" button
+            if (currentItems + actualItemsToAdd >= maxItems) {
+                const viewMoreBtn = document.querySelector('.view-more-btn');
+                if (viewMoreBtn) {
+                    viewMoreBtn.style.display = 'none';
+                }
             }
 
             // Smooth scroll to new items
@@ -1998,6 +2385,356 @@
             </div>
         </div>
     </section>
+
+    <style>
+        .memories {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .memories h2 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .memories-subtitle {
+            text-align: center;
+            color: var(--text-color-light);
+            margin-bottom: 3rem;
+            font-size: 1.2rem;
+        }
+
+        .memories-slider {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
+            height: 600px;
+            padding: 0 20px;
+        }
+
+        .memory-slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            height: 100%;
+        }
+
+        .memory-slide.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .memory-image {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            height: 100%;
+        }
+
+        .memory-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .memory-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+        }
+
+        .memory-year {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .memory-content h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .memory-content p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .memory-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .memory-nav:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .memory-nav.prev {
+            left: 20px;
+        }
+
+        .memory-nav.next {
+            right: 20px;
+        }
+
+        .memories-timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 2rem auto 0;
+            padding: 0 20px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            transform: translateY(-50%);
+        }
+
+        .timeline-markers {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .timeline-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-dot.active {
+            background: var(--primary-color);
+            transform: scale(1.5);
+        }
+
+        .timeline-dot:hover {
+            background: var(--primary-color);
+        }
+
+        /* Large screens (1200px and up) */
+        @media (min-width: 1200px) {
+            .memories-slider {
+                height: 700px;
+            }
+        }
+
+        /* Medium screens (992px to 1199px) */
+        @media (max-width: 1199px) {
+            .memories-slider {
+                height: 600px;
+            }
+        }
+
+        /* Tablets (768px to 991px) */
+        @media (max-width: 991px) {
+            .memories-slider {
+                height: 500px;
+            }
+
+            .memory-content {
+                padding: 1.8rem;
+            }
+
+            .memory-content h3 {
+                font-size: 1.8rem;
+            }
+
+            .memory-content p {
+                font-size: 1.1rem;
+            }
+
+            .memory-year {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Mobile Landscape (576px to 767px) */
+        @media (max-width: 767px) {
+            .memories {
+                padding: 3rem 0;
+            }
+
+            .memories h2 {
+                font-size: 2rem;
+            }
+
+            .memories-subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+
+            .memories-slider {
+                height: 400px;
+                padding: 0 15px;
+            }
+
+            .memory-content {
+                padding: 1.5rem;
+            }
+
+            .memory-content h3 {
+                font-size: 1.5rem;
+            }
+
+            .memory-content p {
+                font-size: 1rem;
+            }
+
+            .memory-year {
+                font-size: 1.2rem;
+            }
+
+            .memory-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .timeline-dot {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        /* Mobile Portrait (up to 575px) */
+        @media (max-width: 575px) {
+            .memories {
+                padding: 2rem 0;
+            }
+
+            .memories h2 {
+                font-size: 1.8rem;
+            }
+
+            .memories-subtitle {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .memories-slider {
+                height: 300px;
+                padding: 0 10px;
+            }
+
+            .memory-content {
+                padding: 1rem;
+            }
+
+            .memory-content h3 {
+                font-size: 1.3rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .memory-content p {
+                font-size: 0.9rem;
+            }
+
+            .memory-year {
+                font-size: 1.1rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .memory-nav {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+
+            .memory-nav.prev {
+                left: 10px;
+            }
+
+            .memory-nav.next {
+                right: 10px;
+            }
+
+            .timeline-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .memories-timeline {
+                margin-top: 1.5rem;
+                padding: 0 5px;
+            }
+        }
+    </style>
+
+    <script>
+        // Add this to your existing JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.memory-slide');
+            const dots = document.querySelectorAll('.timeline-dot');
+            const prevBtn = document.querySelector('.memory-nav.prev');
+            const nextBtn = document.querySelector('.memory-nav.next');
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach(slide => slide.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
+                
+                slides[index].classList.add('active');
+                dots[index].classList.add('active');
+                currentSlide = index;
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            // Event listeners
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => showSlide(index));
+            });
+
+            // Auto slide every 5 seconds
+            setInterval(nextSlide, 5000);
+
+            // Initialize first slide
+            showSlide(0);
+        });
+    </script>
 
     <!-- Locations Section -->
     <section id="locations" class="locations">
@@ -2132,43 +2869,127 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>Bastiramji Mithai Wale</h3>
-                <p>Bringing sweetness to your life since 2002</p>
-            </div>
-            <div class="footer-section">
                 <h3>Quick Links</h3>
                 <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#products">Products</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                    <li><a href="shipping-policy.html">Shipping Policy</a></li>
+                    <li><a href="return-policy.html">Return Policy</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
                 </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-phone"></i> +91 1234567890</p>
+                <p><i class="fas fa-envelope"></i> info@bastiramji.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> 123, Main Street, City, State</p>
             </div>
             <div class="footer-section">
                 <h3>Follow Us</h3>
                 <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://facebook.com/bastiramji" target="_blank"><i class="fab fa-facebook"></i></a>
+                    <a href="https://instagram.com/bastiramji" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://twitter.com/bastiramji" target="_blank"><i class="fab fa-twitter"></i></a>
                 </div>
-            </div>
-            <div class="footer-section">
-                <h3>Newsletter</h3>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Enter your email">
-                    <button type="submit">Subscribe</button>
-                </form>
             </div>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2024 Bastiramji Mithai Wale. All rights reserved.</p>
-            <div class="admin-access">
-                <a href="/admin-login.html" id="adminLink" class="admin-link" style="color: inherit; text-decoration: none; opacity: 0.7; font-size: 0.8rem; margin-left: 10px;">
-                    <i class="fas fa-lock"></i> Admin Access
-                </a>
-            </div>
         </div>
     </footer>
+
+    <style>
+        .footer {
+            background: rgb(156, 10, 10);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffd700;
+        }
+
+        .footer-section p {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #a01111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: #ffd700;
+            color: hsl(0, 82%, 40%)80%, 36%)81%, 37%);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #a70f0f;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-section p {
+                justify-content: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+    </style>
 
     <!-- Modals Section -->
     <div class="modal" id="sweetModal">
@@ -2359,7 +3180,7 @@
             },
             'motichoor-laddu': {
                 id: 'motichoor-laddu',
-                title: 'Motichoor Laddu',
+                title: 'Motichoor Ladoo',
                 price: 600,
                 description: 'Delicate boondi laddus with saffron and cardamom.',
                 image: 'images/signature/motichoor.jpg',
@@ -2394,23 +3215,13 @@
                     return;
                 }
 
-                if (cart[productId]) {
-                    cart[productId].quantity = (cart[productId].quantity || 0) + 1;
-                } else {
-                    cart[productId] = {
-                        ...sweetDetails[productId],
-                        quantity: 1
-                    };
-                }
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCartCount();
-                showToast('Item added to cart!');
+                const quantity = parseInt(document.getElementById('sweetQuantity').value) || 1;
+                cartManager.addToCart(productId, quantity);
                 
-                // Open cart modal after adding item
-                const cartModal = document.getElementById('cartModal');
-                if (cartModal) {
-                    cartModal.classList.add('show');
-                    updateCartModal();
+                // Close the sweet details modal
+                const modal = document.querySelector('.modal');
+                if (modal) {
+                    modal.classList.remove('active');
                 }
             } catch (error) {
                 console.error('Error adding to cart:', error);
@@ -2614,6 +3425,51 @@
             // Show all products initially
             searchProducts();
         });
+
+        // Add this to your existing JavaScript
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function closeMenu(e) {
+                if (!e.target.closest('.nav-links') && !e.target.closest('.mobile-menu-btn')) {
+                    navLinks.classList.remove('active');
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        }
+
+        // Add touch event handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle touch events for mobile menu
+            const navLinks = document.querySelector('.nav-links');
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            navLinks.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            navLinks.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    // Swipe left - close menu
+                    navLinks.classList.remove('active');
+                }
+            }
+
+            // Prevent body scroll when menu is open
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            mobileMenuBtn.addEventListener('click', function() {
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+            });
+        });
     </script>
 
     <!-- Add this before closing body tag -->
@@ -2624,5 +3480,137 @@
 
     <!-- Scripts -->
     <script src="js/sweets.js"></script>
+
+    <script>
+        // Mobile Menu Functionality
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            
+            navLinks.classList.toggle('active');
+            
+            // Change menu icon
+            if (navLinks.classList.contains('active')) {
+                mobileMenuBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            } else {
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.querySelector('.nav-links');
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (!event.target.closest('.nav-links') && 
+                !event.target.closest('.mobile-menu-btn') && 
+                navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                const navLinks = document.querySelector('.nav-links');
+                const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+                
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const navLinks = document.querySelector('.nav-links');
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth > 768 && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+
+    <style>
+        /* Social Media Integration */
+        .social-share {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .social-share a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .social-share a:hover {
+            transform: scale(1.1);
+        }
+
+        .facebook { background: #1877f2; }
+        .twitter { background: #1da1f2; }
+        .whatsapp { background: #25d366; }
+        .instagram { background: #e4405f; }
+
+        @media (max-width: 768px) {
+            .social-share {
+                bottom: 20px;
+                top: auto;
+                right: 20px;
+                flex-direction: row;
+                transform: none;
+            }
+        }
+    </style>
+
+    <!-- Add this before closing body tag -->
+    <div class="social-share">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://bastiramji.com" target="_blank" class="facebook">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://twitter.com/intent/tweet?url=https://bastiramji.com&text=Experience authentic Indian sweets at Bastiramji Mithai Wale!" target="_blank" class="twitter">
+            <i class="fab fa-twitter"></i>
+        </a>
+        <a href="https://wa.me/?text=Check out these amazing Indian sweets at Bastiramji Mithai Wale! https://bastiramji.com" target="_blank" class="whatsapp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="https://www.instagram.com/bastiramji" target="_blank" class="instagram">
+            <i class="fab fa-instagram"></i>
+        </a>
+    </div>
+
+    <script>
+        // Social Media Share Tracking
+        document.querySelectorAll('.social-share a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const platform = this.classList[1];
+                gtag('event', 'share', {
+                    'method': platform,
+                    'content_type': 'website',
+                    'content_id': window.location.href
+                });
+            });
+        });
+    </script>
 </body>
 </html> 

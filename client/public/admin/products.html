@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Management - Bastiramji Mithai Wale</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <style>
+        /* Reuse admin container and sidebar styles from dashboard.html */
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1rem;
+        }
+
+        /* Products specific styles */
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .add-product-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-product-btn:hover {
+            background: #6b0000;
+        }
+
+        .products-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .search-box {
+            flex: 2;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .product-content {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .product-category {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: var(--light-gray);
+            color: var(--text-color);
+        }
+
+        .edit-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .delete-btn {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+
+        .delete-btn:hover {
+            background: rgba(220, 53, 69, 0.2);
+        }
+
+        /* Product Modal */
+        .product-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .product-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .variant-section {
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+
+        .variant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .add-variant-btn {
+            background: var(--light-gray);
+            color: var(--text-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .variant-item {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .remove-variant {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+        }
+
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+            display: none;
+            z-index: 1200;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .bulk-btn {
+            background: var(--light-gray);
+            color: var(--text-color);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .bulk-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .image-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .products-filters {
+                flex-direction: column;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../images/logo/bmw-logo.jpg" alt="BMW Logo">
+                <h2>Admin Panel</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a href="products.html" class="menu-item active">
+                    <i class="fas fa-box"></i>
+                    Products
+                </a>
+                <a href="orders.html" class="menu-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    Orders
+                </a>
+                <a href="users.html" class="menu-item">
+                    <i class="fas fa-users"></i>
+                    Users
+                </a>
+                <a href="payments.html" class="menu-item">
+                    <i class="fas fa-credit-card"></i>
+                    Payments
+                </a>
+                <a href="#" class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navbar -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <div class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                    <h1>Products Management</h1>
+                </div>
+                <div class="navbar-right">
+                    <div class="admin-profile">
+                        <img src="../images/admin-avatar.jpg" alt="Admin">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Products Header -->
+            <div class="products-header">
+                <div class="bulk-actions">
+                    <button class="btn btn-secondary" id="importBtn">
+                        <i class="fas fa-file-import"></i>
+                        Import Products
+                    </button>
+                    <button class="btn btn-secondary" id="exportBtn">
+                        <i class="fas fa-file-export"></i>
+                        Export Products
+                    </button>
+                </div>
+                <button class="btn btn-primary" id="addProductBtn">
+                    <i class="fas fa-plus"></i>
+                    Add New Product
+                </button>
+            </div>
+
+            <!-- Products Filters -->
+            <div class="products-filters">
+                <div class="filter-group">
+                    <select id="categoryFilter" class="form-control">
+                        <option value="">All Categories</option>
+                        <option value="sweets">Sweets</option>
+                        <option value="namkeen">Namkeen</option>
+                        <option value="gift-boxes">Gift Boxes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="sortFilter" class="form-control">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search products...">
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid">
+                <!-- Product cards will be dynamically added here -->
+            </div>
+
+            <!-- Product Modal -->
+            <div class="product-modal" id="productModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Add New Product</h2>
+                        <button class="close-modal" id="closeModal">&times;</button>
+                    </div>
+                    <form class="product-form" id="productForm">
+                        <div class="form-group">
+                            <label for="productName">Product Name</label>
+                            <input type="text" id="productName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productCategory">Category</label>
+                            <select id="productCategory" class="form-control" required>
+                                <option value="sweets">Sweets</option>
+                                <option value="namkeen">Namkeen</option>
+                                <option value="gift-boxes">Gift Boxes</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productPrice">Base Price (₹)</label>
+                                <input type="number" id="productPrice" class="form-control" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="productStock">Base Stock</label>
+                                <input type="number" id="productStock" class="form-control" min="0" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="productDescription">Description</label>
+                            <textarea id="productDescription" class="form-control" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Variants</label>
+                            <div class="variant-section" id="variantsContainer">
+                                <div class="variant-header">
+                                    <h4>Variants</h4>
+                                    <button type="button" class="btn btn-secondary" id="addVariantBtn">
+                                        <i class="fas fa-plus"></i>
+                                        Add Variant
+                                    </button>
+                                </div>
+                                <!-- Variants will be added here -->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Images</label>
+                            <div class="image-upload" id="imageUpload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload images</p>
+                                <input type="file" id="productImages" accept="image/*" multiple style="display: none;">
+                            </div>
+                            <div class="image-preview-container" id="imagePreview">
+                                <!-- Image previews will be added here -->
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Product</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const productsGrid = document.getElementById('productsGrid');
+            const productModal = document.getElementById('productModal');
+            const addProductBtn = document.getElementById('addProductBtn');
+            const closeModal = document.getElementById('closeModal');
+            const productForm = document.getElementById('productForm');
+            const imageUpload = document.getElementById('imageUpload');
+            const productImages = document.getElementById('productImages');
+            const imagePreview = document.getElementById('imagePreview');
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const sortFilter = document.getElementById('sortFilter');
+            const addVariantBtn = document.getElementById('addVariantBtn');
+            const variantsContainer = document.getElementById('variantsContainer');
+            const importBtn = document.getElementById('importBtn');
+            const exportBtn = document.getElementById('exportBtn');
+
+            let currentProductId = null;
+            let selectedImages = [];
+
+            // Show modal
+            addProductBtn.addEventListener('click', () => {
+                currentProductId = null;
+                productForm.reset();
+                imagePreview.innerHTML = '';
+                variantsContainer.innerHTML = `
+                    <div class="variant-header">
+                        <h4>Variants</h4>
+                        <button type="button" class="btn btn-secondary" id="addVariantBtn">
+                            <i class="fas fa-plus"></i>
+                            Add Variant
+                        </button>
+                    </div>
+                `;
+                document.querySelector('.modal-title').textContent = 'Add New Product';
+                productModal.style.display = 'block';
+            });
+
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                productModal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === productModal) {
+                    productModal.style.display = 'none';
+                }
+            });
+
+            // Add variant
+            function addVariant() {
+                const variantItem = document.createElement('div');
+                variantItem.className = 'variant-item';
+                variantItem.innerHTML = `
+                    <button type="button" class="remove-variant" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Variant Name</label>
+                            <input type="text" class="variant-name form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Price (₹)</label>
+                            <input type="number" class="variant-price form-control" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Stock</label>
+                            <input type="number" class="variant-stock form-control" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>SKU</label>
+                            <input type="text" class="variant-sku form-control" required>
+                        </div>
+                    </div>
+                `;
+                variantsContainer.appendChild(variantItem);
+            }
+
+            // Handle image upload
+            imageUpload.addEventListener('click', () => {
+                productImages.click();
+            });
+
+            productImages.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const previewItem = document.createElement('div');
+                            previewItem.className = 'preview-item';
+                            previewItem.innerHTML = `
+                                <img src="${e.target.result}" alt="Preview">
+                                <button type="button" class="remove-image" onclick="this.parentElement.remove()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            imagePreview.appendChild(previewItem);
+                            selectedImages.push(e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+
+            // Handle form submission
+            productForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                try {
+                    UI.showLoading();
+
+                    // Validate form
+                    const name = document.getElementById('productName').value;
+                    const category = document.getElementById('productCategory').value;
+                    const price = parseFloat(document.getElementById('productPrice').value);
+                    const stock = parseInt(document.getElementById('productStock').value);
+                    const description = document.getElementById('productDescription').value;
+
+                    if (!name || !category || !price || !stock || !description) {
+                        UI.showNotification('Please fill all required fields', 'error');
+                        return;
+                    }
+
+                    // Collect variants
+                    const variants = [];
+                    document.querySelectorAll('.variant-item').forEach(item => {
+                        variants.push({
+                            name: item.querySelector('.variant-name').value,
+                            price: parseFloat(item.querySelector('.variant-price').value),
+                            stock: parseInt(item.querySelector('.variant-stock').value),
+                            sku: item.querySelector('.variant-sku').value
+                        });
+                    });
+
+                    const productData = {
+                        name,
+                        category,
+                        price,
+                        stock,
+                        description,
+                        variants,
+                        images: selectedImages
+                    };
+
+                    if (currentProductId) {
+                        // Update existing product
+                        await ApiService.updateProduct(currentProductId, productData);
+                        UI.showNotification('Product updated successfully');
+                    } else {
+                        // Add new product
+                        await ApiService.createProduct(productData);
+                        UI.showNotification('Product added successfully');
+                    }
+
+                    productModal.style.display = 'none';
+                    loadProducts();
+                } catch (error) {
+                    UI.showNotification(error.message, 'error');
+                } finally {
+                    UI.hideLoading();
+                }
+            });
+
+            // Handle import/export
+            importBtn.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = async (e) => {
+                    try {
+                        UI.showLoading();
+                        const file = e.target.files[0];
+                        const reader = new FileReader();
+                        reader.onload = async (e) => {
+                            try {
+                                const importedProducts = JSON.parse(e.target.result);
+                                for (const product of importedProducts) {
+                                    await ApiService.createProduct(product);
+                                }
+                                UI.showNotification('Products imported successfully');
+                                loadProducts();
+                            } catch (error) {
+                                UI.showNotification('Error importing products', 'error');
+                            }
+                        };
+                        reader.readAsText(file);
+                    } finally {
+                        UI.hideLoading();
+                    }
+                };
+                input.click();
+            });
+
+            exportBtn.addEventListener('click', async () => {
+                try {
+                    UI.showLoading();
+                    const products = await ApiService.getProducts();
+                    const dataStr = JSON.stringify(products, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    const exportFileDefaultName = 'products.json';
+
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                } catch (error) {
+                    UI.showNotification('Error exporting products', 'error');
+                } finally {
+                    UI.hideLoading();
+                }
+            });
+
+            // Add variant button click
+            addVariantBtn.addEventListener('click', addVariant);
+
+            // Load products
+            async function loadProducts() {
+                try {
+                    UI.showLoading();
+                    const products = await ApiService.getProducts();
+                    renderProducts(products);
+                } catch (error) {
+                    UI.showNotification('Error loading products', 'error');
+                } finally {
+                    UI.hideLoading();
+                }
+            }
+
+            // Render products
+            function renderProducts(products) {
+                productsGrid.innerHTML = '';
+                
+                let filteredProducts = [...products];
+
+                // Apply search filter
+                const searchTerm = searchInput.value.toLowerCase();
+                if (searchTerm) {
+                    filteredProducts = filteredProducts.filter(product => 
+                        product.name.toLowerCase().includes(searchTerm) ||
+                        product.description.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                // Apply category filter
+                const category = categoryFilter.value;
+                if (category) {
+                    filteredProducts = filteredProducts.filter(product => 
+                        product.category === category
+                    );
+                }
+
+                // Apply sorting
+                const sortBy = sortFilter.value;
+                switch (sortBy) {
+                    case 'newest':
+                        filteredProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                        break;
+                    case 'oldest':
+                        filteredProducts.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                        break;
+                    case 'price-low':
+                        filteredProducts.sort((a, b) => a.price - b.price);
+                        break;
+                    case 'price-high':
+                        filteredProducts.sort((a, b) => b.price - a.price);
+                        break;
+                }
+
+                filteredProducts.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                        <div class="product-image">
+                            <img src="${product.images[0]}" alt="${product.name}">
+                            <span class="product-badge">${product.category}</span>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">${product.name}</h3>
+                            <p class="product-category">${product.category}</p>
+                            <div class="product-price">${UI.formatCurrency(product.price)}</div>
+                            <div class="product-actions">
+                                <button class="btn btn-secondary" onclick="editProduct('${product.id}')">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteProduct('${product.id}')">
+                                    <i class="fas fa-trash"></i>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    productsGrid.appendChild(productCard);
+                });
+            }
+
+            // Edit product
+            window.editProduct = async function(id) {
+                try {
+                    UI.showLoading();
+                    const product = await ApiService.getProducts(id);
+                    if (product) {
+                        currentProductId = id;
+                        document.getElementById('productName').value = product.name;
+                        document.getElementById('productCategory').value = product.category;
+                        document.getElementById('productPrice').value = product.price;
+                        document.getElementById('productStock').value = product.stock;
+                        document.getElementById('productDescription').value = product.description;
+                        
+                        // Clear and add variants
+                        variantsContainer.innerHTML = `
+                            <div class="variant-header">
+                                <h4>Variants</h4>
+                                <button type="button" class="btn btn-secondary" id="addVariantBtn">
+                                    <i class="fas fa-plus"></i>
+                                    Add Variant
+                                </button>
+                            </div>
+                        `;
+                        product.variants.forEach(variant => {
+                            const variantItem = document.createElement('div');
+                            variantItem.className = 'variant-item';
+                            variantItem.innerHTML = `
+                                <button type="button" class="remove-variant" onclick="this.parentElement.remove()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Variant Name</label>
+                                        <input type="text" class="variant-name form-control" value="${variant.name}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Price (₹)</label>
+                                        <input type="number" class="variant-price form-control" value="${variant.price}" min="0" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Stock</label>
+                                        <input type="number" class="variant-stock form-control" value="${variant.stock}" min="0" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>SKU</label>
+                                        <input type="text" class="variant-sku form-control" value="${variant.sku}" required>
+                                    </div>
+                                </div>
+                            `;
+                            variantsContainer.appendChild(variantItem);
+                        });
+
+                        // Clear and add images
+                        imagePreview.innerHTML = '';
+                        selectedImages = product.images;
+                        product.images.forEach(image => {
+                            const previewItem = document.createElement('div');
+                            previewItem.className = 'preview-item';
+                            previewItem.innerHTML = `
+                                <img src="${image}" alt="Preview">
+                                <button type="button" class="remove-image" onclick="this.parentElement.remove()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            imagePreview.appendChild(previewItem);
+                        });
+
+                        document.querySelector('.modal-title').textContent = 'Edit Product';
+                        productModal.style.display = 'block';
+                    }
+                } catch (error) {
+                    UI.showNotification('Error loading product details', 'error');
+                } finally {
+                    UI.hideLoading();
+                }
+            };
+
+            // Delete product
+            window.deleteProduct = async function(id) {
+                if (confirm('Are you sure you want to delete this product?')) {
+                    try {
+                        UI.showLoading();
+                        await ApiService.deleteProduct(id);
+                        UI.showNotification('Product deleted successfully');
+                        loadProducts();
+                    } catch (error) {
+                        UI.showNotification('Error deleting product', 'error');
+                    } finally {
+                        UI.hideLoading();
+                    }
+                }
+            };
+
+            // Handle filters
+            searchInput.addEventListener('input', () => loadProducts());
+            categoryFilter.addEventListener('change', () => loadProducts());
+            sortFilter.addEventListener('change', () => loadProducts());
+
+            // Initial load
+            loadProducts();
+        });
+    </script>
+</body>
+</html> 

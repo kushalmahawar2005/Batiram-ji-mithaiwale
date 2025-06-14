@@ -17,12 +17,38 @@ const productSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum: ['sweets', 'namkeen', 'signature']
+        enum: ['sweets', 'namkeen', 'boxes', 'dry-fruits']
+    },
+    subcategory: {
+        type: String,
+        required: true,
+        enum: ['dry-fruit-sweets', 'bengali-sweets', 'milk-sweets', 'festive-sweets', 'mawa-sweets', 'south-indian', 'Indian-sweets', 'seasonal-sweets', 'all']
     },
     images: [{
         type: String,
         required: true
     }],
+    rating: {
+        type: String,
+        default: '4.5/5'
+    },
+    badge: {
+        type: String,
+        enum: ['Bestseller', 'Popular', 'Classic', 'Festive', 'Traditional', 'Premium', 'Seasonal', 'Corporate', 'Healthy', null],
+        default: null
+    },
+    ingredients: {
+        type: String,
+        required: true
+    },
+    shelfLife: {
+        type: String,
+        required: true
+    },
+    packaging: {
+        type: String,
+        required: true
+    },
     stock: {
         type: Number,
         required: true,

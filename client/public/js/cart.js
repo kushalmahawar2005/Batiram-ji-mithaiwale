@@ -1,79 +1,167 @@
 // Unified cart system
-let cart = {
-    items: [],
-    total: 0
+const CART_CONFIG = {
+    maxQuantity: 20,
+    minQuantity: 1,
+    taxRate: 0.18, // 18% GST
+    storageKey: 'cartData',
+    currency: '₹'
 };
-const sweetDetails = {
+
+// Product data for all items
+const productData = {
+    // Namkeen products
+    "dal-moth": {
+        id: "dal-moth",
+        title: "Dal Moth Special",
+        price: 180,
+        image: "images/namkeen/dal_mot.jpg",
+        category: "namkeen",
+        description: "Crispy lentil-based snack with aromatic spices"
+    },
+    "traditional-mixture": {
+        id: "traditional-mixture",
+        title: "Traditional Mixture",
+        price: 200,
+        image: "images/namkeen/mixture.jpg",
+        category: "namkeen",
+        description: "Classic mix of various crispy snacks and nuts"
+    },
+    "chakli": {
+        id: "chakli",
+        title: "Spiral Chakli",
+        price: 220,
+        image: "images/namkeen/chakli.jpg",
+        category: "namkeen",
+        description: "Crispy spiral-shaped snack with traditional spices"
+    },
+    "aloo-bhujia": {
+        id: "aloo-bhujia",
+        title: "Aloo Bhujia",
+        price: 160,
+        image: "images/namkeen/alu_bhojia.jpeg",
+        category: "namkeen",
+        description: "Crispy potato noodles with traditional spices"
+    },
+    "moong-bhujia": {
+        id: "moong-bhujia",
+        title: "Moong Bhujia",
+        price: 180,
+        image: "images/namkeen/moong_bhujia.jpg",
+        category: "namkeen",
+        description: "Crispy moong dal noodles with special spices"
+    },
+    "besan-bhujia": {
+        id: "besan-bhujia",
+        title: "Besan Bhujia",
+        price: 200,
+        image: "images/namkeen/besan_bhujia.jpg",
+        category: "namkeen",
+        description: "Crispy gram flour noodles with special spices"
+    },
+    "khatta-meetha": {
+        id: "khatta-meetha",
+        title: "Khatta Meetha",
+        price: 220,
+        image: "images/namkeen/khata_meetha.jpg",
+        category: "namkeen",
+        description: "Sweet and tangy mix with dried fruits"
+    },
+    "dry-fruit-mixture": {
+        id: "dry-fruit-mixture",
+        title: "Dry Fruit Mixture",
+        price: 240,
+        image: "images/namkeen/dry_fruit_mixture.jpg",
+        category: "namkeen",
+        description: "Premium mix of nuts and dried fruits"
+    },
+    "spicy-mixture": {
+        id: "spicy-mixture",
+        title: "Spicy Mixture",
+        price: 200,
+        image: "images/namkeen/spicy_mixture.jpg",
+        category: "namkeen",
+        description: "Hot and spicy mix of various snacks"
+    },
+    "masala-mathri": {
+        id: "masala-mathri",
+        title: "Masala Mathri",
+        price: 180,
+        image: "images/namkeen/masala_mathri.jpeg",
+        category: "namkeen",
+        description: "Flaky, spiced crackers made with premium flour"
+    },
+    "ajwain-mathri": {
+        id: "ajwain-mathri",
+        title: "Ajwain Mathri",
+        price: 200,
+        image: "images/namkeen/ajwain_mathri.jpg",
+        category: "namkeen",
+        description: "Flaky crackers with carom seeds"
+    },
+    "methi-mathri": {
+        id: "methi-mathri",
+        title: "Methi Mathri",
+        price: 220,
+        image: "images/namkeen/methi_mathri.jpg",
+        category: "namkeen",
+        description: "Fenugreek flavored crispy crackers"
+    },
+
+    // Sweets products
     "kaju-katli": {
       id: "kaju-katli",
       title: "Kaju Katli",
-      price: 400,
-      image: "images/products/kaju-katli.jpg"
+        price: 800,
+        image: "images/signature/kaju-katli.jpg",
+        category: "sweets",
+        description: "Premium quality kaju katli made with pure cashews and cardamom"
     },
     "rasmalai": {
       id: "rasmalai",
       title: "Rasmalai",
-      price: 350,
-      image: "images/products/rasmalai.jpg"
+        price: 600,
+        image: "images/signature/rasmalai.jpg",
+        category: "sweets",
+        description: "Soft and creamy rasmalai in sweetened milk"
     },
     "gulab-jamun": {
       id: "gulab-jamun",
       title: "Gulab Jamun",
-      price: 250,
-      image: "images/products/gulab-jamun.jpg"
+        price: 400,
+        image: "images/signature/gulab-jamun.jpg",
+        category: "sweets",
+        description: "Soft and spongy gulab jamun in sugar syrup"
+    },
+    "motichoor-laddu": {
+        id: "motichoor-laddu",
+        title: "Motichoor Laddu",
+        price: 500,
+        image: "images/signature/motichoor-laddu.jpg",
+        category: "sweets",
+        description: "Traditional motichoor laddu made with fine boondi"
+    },
+    "besan-laddu": {
+        id: "besan-laddu",
+        title: "Besan Laddu",
+        price: 450,
+        image: "images/signature/besan-laddu.jpg",
+        category: "sweets",
+        description: "Rich and flavorful besan laddu with ghee"
+    },
+    "milk-barfi": {
+        id: "milk-barfi",
+        title: "Milk Barfi",
+        price: 350,
+        image: "images/signature/milk-barfi.jpg",
+        category: "sweets",
+        description: "Creamy milk barfi with a rich texture"
     }
-    // Add more if needed
-  };
-  
+};
 
 // Universal product lookup function
 function getProductById(productId) {
-    // Convert numeric IDs to strings for consistency
     const id = String(productId);
-    
-    // Try to find in products array (from sweets.js)
-    if (typeof products !== 'undefined') {
-        const product = products.find(p => String(p.id) === id);
-        if (product) {
-            return {
-                ...product,
-                price: extractPrice(product.price)
-            };
-        }
-    }
-    
-    // Try to find in allSweets array (from script.js)
-    if (typeof allSweets !== 'undefined') {
-        const sweet = allSweets.find(s => String(s.id) === id);
-        if (sweet) {
-            return {
-                ...sweet,
-                price: extractPrice(sweet.price)
-            };
-        }
-    }
-    
-    // Try to find in sweetDetails object
-    if (typeof sweetDetails !== 'undefined' && sweetDetails[id]) {
-        return {
-            ...sweetDetails[id],
-            price: extractPrice(sweetDetails[id].price)
-        };
-    }
-    
-    // Try to find in sweetProducts array
-    if (typeof sweetProducts !== 'undefined') {
-        const sweet = sweetProducts.find(p => String(p.id) === id);
-        if (sweet) {
-            return {
-                ...sweet,
-                price: extractPrice(sweet.price)
-            };
-        }
-    }
-    
-    console.error('Product not found:', id);
-    return null;
+    return productData[id] || null;
 }
 
 // Extract numeric price from string price
@@ -112,205 +200,252 @@ function extractPrice(price) {
     return 0;
 }
 
-// Add to cart
-function addToCart(productId) {
-    try {
-        const product = getProductById(productId);
-        if (!product) {
-            showNotification('Product not found', 'error');
-            return;
+// Cart Manager Class
+class CartManager {
+    constructor() {
+        this.cart = this.loadCart();
+        this.initializeEventListeners();
+        this.updateCartUI();
+    }
+
+    loadCart() {
+        try {
+            const savedCart = localStorage.getItem(CART_CONFIG.storageKey);
+            if (!savedCart) return { items: [], subtotal: 0, tax: 0, total: 0 };
+            
+            const cart = JSON.parse(savedCart);
+            // Ensure cart has the correct structure
+            return {
+                items: Array.isArray(cart.items) ? cart.items : [],
+                subtotal: cart.subtotal || 0,
+                tax: cart.tax || 0,
+                total: cart.total || 0
+            };
+        } catch (error) {
+            console.error('Error loading cart:', error);
+            return { items: [], subtotal: 0, tax: 0, total: 0 };
         }
+    }
 
-        // Get quantity from modal if it exists
-        const quantityElement = document.getElementById(`quantity-${productId}`);
-        const quantity = quantityElement ? parseInt(quantityElement.textContent) : 1;
+    saveCart() {
+        try {
+            this.calculateTotals();
+            localStorage.setItem(CART_CONFIG.storageKey, JSON.stringify(this.cart));
+            this.updateCartUI();
+        } catch (error) {
+            console.error('Error saving cart:', error);
+        }
+    }
 
-        // Check if product already exists in cart
-        const existingItem = cart.items.find(item => item.id === String(productId));
+    calculateTotals() {
+        this.cart.subtotal = this.cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        this.cart.tax = this.cart.subtotal * CART_CONFIG.taxRate;
+        this.cart.total = this.cart.subtotal + this.cart.tax;
+    }
+
+    addToCart(product) {
+        try {
+            const existingItem = this.cart.items.find(item => item.id === product.id);
         
         if (existingItem) {
-            // If product exists, increment quantity
-            existingItem.quantity += quantity;
+                if (existingItem.quantity >= CART_CONFIG.maxQuantity) {
+                    showToast(`Maximum quantity (${CART_CONFIG.maxQuantity}) reached for this item`);
+                    return;
+                }
+                existingItem.quantity++;
         } else {
-            // If product doesn't exist, add it with specified quantity
-            cart.items.push({
-                id: String(productId),
-                name: product.title || product.name,
+                this.cart.items.push({
+                    id: product.id,
+                    title: product.title,
                 price: product.price,
-                image: product.image,
-                quantity: quantity
-            });
-        }
+                    quantity: 1,
+                    image: product.image
+                });
+            }
 
-        // Update cart count and show notification
-        updateCartDisplay();
-        showNotification('Product added to cart!', 'success');
-
-        // Save cart to localStorage
-        saveCart();
-
-        // Close modal if it's open
-        closeModal('productModal');
+            this.saveCart();
+            showToast('Item added to cart!');
     } catch (error) {
         console.error('Error adding to cart:', error);
-        showNotification('Error adding product to cart', 'error');
+            showToast('Error adding item to cart');
+        }
     }
-}
 
-// Remove from cart
-function removeFromCart(productId) {
-    cart.items = cart.items.filter(item => item.id !== String(productId));
-    updateCartDisplay();
-    showNotification('Item removed from cart', 'success');
-    saveCart();
-}
+    removeFromCart(productId) {
+        try {
+            this.cart.items = this.cart.items.filter(item => item.id !== productId);
+            this.saveCart();
+            showToast('Item removed from cart');
+        } catch (error) {
+            console.error('Error removing from cart:', error);
+            showToast('Error removing item from cart');
+        }
+    }
 
-// Update quantity
-function updateQuantity(productId, change) {
-    const item = cart.items.find(item => item.id === String(productId));
+    updateQuantity(productId, quantity) {
+        try {
+            const item = this.cart.items.find(item => item.id === productId);
     if (!item) return;
 
-    item.quantity += change;
-    if (item.quantity <= 0) {
-        removeFromCart(productId);
-    } else {
-        updateCartDisplay();
-        saveCart();
+            if (quantity <= 0) {
+                this.removeFromCart(productId);
+                return;
+            }
+
+            if (quantity > CART_CONFIG.maxQuantity) {
+                showToast(`Maximum quantity (${CART_CONFIG.maxQuantity}) reached for this item`);
+                return;
+            }
+
+            item.quantity = quantity;
+            this.saveCart();
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            showToast('Error updating quantity');
+        }
     }
-}
 
-// Update cart display
-function updateCartDisplay() {
+    updateCartUI() {
+        try {
+            // Update cart count
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                const totalItems = this.cart.items.reduce((sum, item) => sum + item.quantity, 0);
+                cartCount.textContent = totalItems;
+                cartCount.style.display = totalItems > 0 ? 'block' : 'none';
+            }
+
+            // Update cart modal if it exists
     const cartItems = document.getElementById('cartItems');
+            const cartSubtotal = document.getElementById('cartSubtotal');
+            const cartTax = document.getElementById('cartTax');
     const cartTotal = document.getElementById('cartTotal');
-    const cartCount = document.getElementById('cartCount');
+            const checkoutBtn = document.getElementById('checkoutBtn');
 
-    if (!cartItems) return;
-
-    // Calculate total
-    cart.total = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-
-    // Update cart items
-    cartItems.innerHTML = cart.items.map(item => `
-        <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
+            if (cartItems) {
+                if (this.cart.items.length === 0) {
+                    cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+                } else {
+                    cartItems.innerHTML = this.cart.items.map(item => `
+                        <div class="cart-item" data-product-id="${item.id}">
+                            <img src="${item.image}" alt="${item.title}" onerror="this.src='images/placeholder.jpg'">
             <div class="cart-item-details">
-                <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">₹${item.price}</div>
-                <div class="cart-item-quantity">
-                    <button class="quantity-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
+                                <h4>${item.title}</h4>
+                                <p>${CART_CONFIG.currency}${item.price} x ${item.quantity}</p>
+                                <div class="cart-item-actions">
+                                    <button onclick="cartManager.updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
                     <span>${item.quantity}</span>
-                    <button class="quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
-                </div>
-            </div>
-            <button class="remove-item" onclick="removeFromCart('${item.id}')">
+                                    <button onclick="cartManager.updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
+                                    <button class="remove-item" onclick="cartManager.removeFromCart('${item.id}')">
                 <i class="fas fa-trash"></i>
             </button>
+                                </div>
+                            </div>
+                            <div class="cart-item-total">${CART_CONFIG.currency}${(item.price * item.quantity).toFixed(2)}</div>
         </div>
     `).join('');
+                }
+            }
 
-    // Update total and count
-    if (cartTotal) cartTotal.textContent = `₹${cart.total}`;
-    if (cartCount) cartCount.textContent = cart.items.reduce((count, item) => count + item.quantity, 0);
-
-    // Add responsive styles if not already in document
-    if (!document.getElementById('cart-styles')) {
-        const style = document.createElement('style');
-        style.id = 'cart-styles';
-        style.textContent = `
-            .cart-modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                right: 0;
-                width: 100%;
-                max-width: 400px;
-                height: 100%;
-                background: white;
-                box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-                z-index: 1000;
-                overflow-y: auto;
-            }
-            .cart-item {
-                display: flex;
-                gap: 15px;
-                padding: 15px;
-                border-bottom: 1px solid #eee;
-            }
-            .cart-item img {
-                width: 80px;
-                height: 80px;
-                object-fit: cover;
-                border-radius: 8px;
-            }
-            .cart-item-details {
-                flex: 1;
-            }
-            .cart-item-quantity {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin-top: 10px;
-            }
-            .quantity-btn {
-                padding: 5px 10px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                background: white;
-                cursor: pointer;
-            }
-            .remove-item {
-                color: #ff6b6b;
-                border: none;
-                background: none;
-                cursor: pointer;
-            }
-            @media (max-width: 768px) {
-                .cart-modal {
-                    max-width: 100%;
-                }
-                .cart-item {
-                    flex-direction: column;
-                    align-items: center;
-                    text-align: center;
-                }
-                .cart-item img {
-                    width: 120px;
-                    height: 120px;
-                }
-                .cart-item-quantity {
-                    justify-content: center;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+            if (cartSubtotal) cartSubtotal.textContent = `${CART_CONFIG.currency}${this.cart.subtotal.toFixed(2)}`;
+            if (cartTax) cartTax.textContent = `${CART_CONFIG.currency}${this.cart.tax.toFixed(2)}`;
+            if (cartTotal) cartTotal.textContent = `${CART_CONFIG.currency}${this.cart.total.toFixed(2)}`;
+            if (checkoutBtn) checkoutBtn.disabled = this.cart.items.length === 0;
+        } catch (error) {
+            console.error('Error updating cart UI:', error);
+        }
     }
-}
 
-// Toggle cart modal
-function toggleCart() {
+    initializeEventListeners() {
+        // Cart icon click
+        const cartIcon = document.querySelector('.cart-icon');
+        if (cartIcon) {
+            cartIcon.addEventListener('click', () => this.toggleCart());
+        }
+
+        // Close cart when clicking outside
+        document.addEventListener('click', (e) => {
+            const cartModal = document.getElementById('cartModal');
+            if (cartModal && !cartModal.contains(e.target) && !e.target.closest('.cart-icon')) {
+                cartModal.classList.remove('show');
+            }
+        });
+
+        // Close cart button
+        const closeCartBtn = document.getElementById('closeCart');
+        if (closeCartBtn) {
+            closeCartBtn.addEventListener('click', () => this.toggleCart());
+        }
+
+        // Checkout button
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', () => this.proceedToCheckout());
+        }
+    }
+
+    toggleCart(forceShow = false) {
     const cartModal = document.getElementById('cartModal');
     if (!cartModal) return;
     
-    cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block';
-    if (cartModal.style.display === 'block') {
-        updateCartDisplay();
+        if (forceShow) {
+            cartModal.classList.add('show');
+        } else {
+    cartModal.classList.toggle('show');
+        }
+
+    if (cartModal.classList.contains('show')) {
+            this.updateCartUI();
+        }
+    }
+
+    proceedToCheckout() {
+        if (this.cart.items.length === 0) {
+            showToast('Your cart is empty!', 'error');
+            return;
+        }
+
+        this.calculateTotals();
+        // Save cart data before proceeding to checkout
+        localStorage.setItem(CART_CONFIG.storageKey, JSON.stringify(this.cart));
+        window.location.href = 'payment.html';
+    }
+
+    clearCart() {
+        this.cart = {
+            items: [],
+            subtotal: 0,
+            tax: 0,
+            total: 0
+        };
+        this.saveCart();
+        this.updateCartUI();
     }
 }
 
-// Save cart to localStorage
-function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(cart));
+// Initialize cart manager
+const cartManager = new CartManager();
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+    }, 100);
 }
 
-// Load cart from localStorage
-function loadCart() {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
-        updateCartDisplay();
-    }
-}
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    cartManager.updateCartUI();
+});
 
 // Show notification
 function showNotification(message, type = 'info') {
@@ -475,46 +610,202 @@ function showSweetDetails(id) {
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
         document.body.style.overflow = 'auto';
     }
 }
 
-// Initialize cart when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    loadCart();
-    
-    // Add cart modal close handlers
-    const cartModal = document.getElementById('cartModal');
-    if (cartModal) {
-        // Close when clicking outside
-        cartModal.addEventListener('click', (e) => {
-            if (e.target === cartModal) {
-                toggleCart();
-            }
-        });
+// Cart functionality
+function addToCart(productId) {
+    const product = getProductById(productId);
+    if (!product) {
+        console.error('Product not found:', productId);
+        return;
+    }
 
-        // Close when clicking close button
-        const closeBtn = cartModal.querySelector('.close-modal');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', toggleCart);
+    const existingItem = cart.items.find(item => item.id === productId);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.items.push({
+            ...product,
+            quantity: 1
+        });
+    }
+
+    updateCart();
+    showToast('Item added to cart!');
+}
+
+function removeFromCart(productId) {
+    cart.items = cart.items.filter(item => item.id !== productId);
+    updateCart();
+    showToast('Item removed from cart!');
+}
+
+function updateQuantity(productId, quantity) {
+    const item = cart.items.find(item => item.id === productId);
+    if (item) {
+        if (quantity <= 0) {
+            removeFromCart(productId);
+        } else {
+            item.quantity = quantity;
+            updateCart();
+        }
+    }
+}
+
+function updateCart() {
+    // Calculate total
+    cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Update cart count
+    const cartCount = document.querySelector('.cart-count');
+    if (cartCount) {
+        cartCount.textContent = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    // Update cart modal
+    const cartItems = document.getElementById('cartItems');
+    if (cartItems) {
+        if (cart.items.length === 0) {
+            cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+        } else {
+            cartItems.innerHTML = cart.items.map(item => `
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.title}" onerror="this.src='images/placeholder.jpg'">
+                    <div class="cart-item-details">
+                        <h4>${item.title}</h4>
+                        <p>₹${item.price} x ${item.quantity}</p>
+                        <div class="cart-item-actions">
+                            <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
+                            <button class="remove-item" onclick="removeFromCart('${item.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cart-item-total">₹${item.price * item.quantity}</div>
+                </div>
+            `).join('');
         }
     }
 
-    // Initialize cart icon click handler
+    // Update totals
+    const subtotal = document.getElementById('cartSubtotal');
+    const tax = document.getElementById('cartTax');
+    const total = document.getElementById('cartTotal');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+
+    if (subtotal) subtotal.textContent = `₹${cart.total}`;
+    if (tax) tax.textContent = `₹${(cart.total * 0.18).toFixed(2)}`;
+    if (total) total.textContent = `₹${(cart.total * 1.18).toFixed(2)}`;
+    if (checkoutBtn) checkoutBtn.disabled = cart.items.length === 0;
+
+    // Save to localStorage using the consistent key
+    const cartData = {
+        items: cart.items,
+        subtotal: cart.total,
+        tax: cart.total * 0.18,
+        total: cart.total * 1.18
+    };
+    localStorage.setItem(CART_CONFIG.storageKey, JSON.stringify(cartData));
+}
+
+function toggleCart() {
+    const cartModal = document.getElementById('cartModal');
+    if (cartModal) {
+        cartModal.classList.toggle('show');
+        if (cartModal.classList.contains('show')) {
+            updateCart();
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        } else {
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+    }
+}
+
+// Initialize cart from localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+        cart = JSON.parse(savedCart);
+        updateCart();
+    }
+
+    // Add click event listener for cart icon
     const cartIcon = document.querySelector('.cart-icon');
     if (cartIcon) {
         cartIcon.addEventListener('click', toggleCart);
     }
 
-    // Add product modal close handlers
-    const productModal = document.getElementById('productModal');
-    if (productModal) {
-        // Close when clicking outside
-        productModal.addEventListener('click', (e) => {
-            if (e.target === productModal) {
-                closeModal('productModal');
+    // Close cart modal when clicking outside
+    document.addEventListener('click', function(event) {
+        const cartModal = document.getElementById('cartModal');
+        const cartIcon = document.querySelector('.cart-icon');
+        if (cartModal && !cartModal.contains(event.target) && !cartIcon.contains(event.target)) {
+            cartModal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Close cart modal when clicking close button
+    const closeCartBtn = document.getElementById('closeCart');
+    if (closeCartBtn) {
+        closeCartBtn.addEventListener('click', function() {
+            const cartModal = document.getElementById('cartModal');
+            if (cartModal) {
+                cartModal.classList.remove('show');
+                document.body.style.overflow = 'auto';
             }
         });
     }
 }); 
+
+// Add checkout functionality
+function initializeCheckout() {
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', function() {
+            if (Object.keys(cartManager.cart).length === 0) {
+                showToast('Your cart is empty!');
+                return;
+            }
+
+            // Calculate total amount
+            const total = Object.values(cartManager.cart).reduce((sum, item) => {
+                return sum + (item.price * item.quantity);
+            }, 0);
+
+            // Initialize Razorpay
+            const options = {
+                key: "rzp_test_YOUR_KEY_HERE", // Replace with your Razorpay key
+                amount: total * 100, // Amount in paise
+                currency: "INR",
+                name: "Bastiramji Mithai Wale",
+                description: "Payment for your order",
+                handler: function(response) {
+                    // Handle successful payment
+                    showToast('Payment successful! Order placed.');
+                    // Clear cart after successful payment
+                    cartManager.cart = {};
+                    cartManager.saveCart();
+                    cartManager.updateCartUI();
+                    cartManager.toggleCart();
+                },
+                prefill: {
+                    name: "Customer Name",
+                    email: "customer@example.com",
+                    contact: "9999999999"
+                },
+                theme: {
+                    color: "#8B0000"
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        });
+    }
+} 

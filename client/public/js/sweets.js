@@ -67,12 +67,12 @@ const products = [
         badge: 'Classic'
     },
     {
-        id: 'mathura-peda',
-        title: 'Mathura Peda',
+        id: 'Kala Jamun',
+        title: 'Kala Jamun',
         image: 'images/products/mathura-peda.jpg',
         price: 400,
         rating: '4.7/5',
-        description: 'Traditional Mathura peda with khoya.',
+        description: 'Traditional Kala Jamun with khoya.',
         category: 'sweets',
         subcategory: 'mawa-sweets',
         badge: 'Regional'
@@ -89,14 +89,14 @@ const products = [
         badge: 'Premium'
     },
     {
-        id: 'badusha',
-        title: 'Badusha',
+        id: 'Makhan Beda',
+        title: 'Makhan Beda',
         image: 'images/products/badusha.jpg',
         price: 450,
         rating: '4.6/5',
-        description: 'Flaky and sweet traditional badusha.',
+        description: 'Traditional Makhan Beda.',
         category: 'sweets',
-        subcategory: 'south-indian',
+        subcategory: 'Indian-sweets',
         badge: 'Traditional'
     },
     {
@@ -111,30 +111,30 @@ const products = [
         badge: 'Seasonal'
     },
     {
-        id: 'kheer',
-        title: 'Kheer',
+        id: 'Kesar Peda',
+        title: 'Kesar Peda',
         image: 'images/products/kheer.jpg',
         price: 400,
         rating: '4.7/5',
-        description: 'Creamy rice kheer with cardamom and dry fruits.',
+        description: 'Sweet Kesar Peda.',
         category: 'sweets',
-        subcategory: 'seasonal-sweets',
+        subcategory: 'sweets',
         badge: 'Classic'
     },
     {
-        id: 'shahi-tukda',
-        title: 'Shahi Tukda',
+        id: 'White Choclate Laddu',
+        title: 'White Choclate Laddu',
         image: 'images/products/shahi-tukda.jpg',
         price: 500,
         rating: '4.8/5',
-        description: 'Rich bread pudding with rabri and dry fruits.',
+        description: 'Special White Choclate Laddu.',
         category: 'sweets',
-        subcategory: 'seasonal-sweets',
+        subcategory: 'sweets',
         badge: 'Premium'
     },
     {
-        id: 'sev',
-        title: 'Sev',
+        id: 'Choclate Laduu',
+        title: 'Choclate Laduu',
         image: 'images/products/sev.jpg',
         price: 200,
         rating: '4.7/5',
@@ -144,8 +144,8 @@ const products = [
         badge: 'Popular'
     },
     {
-        id: 'chakli',
-        title: 'Chakli',
+        id: 'Gulab Ladu',
+        title: 'Gulab Ladu',
         image: 'images/products/chakli.jpg',
         price: 300,
         rating: '4.6/5',
