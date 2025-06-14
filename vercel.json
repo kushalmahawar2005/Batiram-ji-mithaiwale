@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "name": "bastiramji-mithai-wale",
+    "builds": [
+        {
+            "src": "client/public/**/*",
+            "use": "@vercel/static"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/client/public/$1"
+        }
+    ]
+} 
