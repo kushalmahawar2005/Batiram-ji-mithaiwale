@@ -1,5 +1,5 @@
 # Dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.js
 
@@ -12,7 +12,6 @@
 
 # Production
 /build
-/dist
 
 # Misc
 .DS_Store
@@ -27,33 +26,32 @@ yarn-error.log*
 .env*.local
 .env
 
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
 # IDE
 .idea/
 .vscode/
 
-# Large media files
-*.mp4
-*.mov
-*.avi
-*.wmv
-*.flv
-*.mkv
-*.webm
+# Large files and media
+*.msi
+*.iso
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
 
-# Images (if they're too large)
-*.psd
-*.ai
-*.indd
-*.ind
-*.indt
-*.raw
-*.cr2
-*.nef
-*.arw
+# Images
+client/public/images/shop/*.jpg
+client/public/images/shop/*.jpeg
+client/public/images/shop/*.png
+client/public/images/shop/*.gif
+client/public/images/memories/*.msi
+
+# Keep image directories but ignore contents
+!client/public/images/shop/
+!client/public/images/memories/
+
+# Server specific
+server/node_modules/
+server/uploads/
+server/logs/
+server/.env
