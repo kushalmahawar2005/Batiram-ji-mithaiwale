@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments Management - Bastiramji Mithai Wale</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../images/logo/bmw-logo.jpg" alt="BMW Logo">
+                <h2>Admin Panel</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a href="products.html" class="menu-item">
+                    <i class="fas fa-box"></i>
+                    Products
+                </a>
+                <a href="orders.html" class="menu-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    Orders
+                </a>
+                <a href="users.html" class="menu-item">
+                    <i class="fas fa-users"></i>
+                    Users
+                </a>
+                <a href="payments.html" class="menu-item active">
+                    <i class="fas fa-credit-card"></i>
+                    Payments
+                </a>
+                <a href="#" class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navbar -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <div class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                    <h1>Payments Management</h1>
+                </div>
+                <div class="navbar-right">
+                    <div class="admin-profile">
+                        <img src="../images/admin-avatar.jpg" alt="Admin">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Payment Summary -->
+            <div class="payment-summary">
+                <div class="summary-card">
+                    <i class="fas fa-rupee-sign"></i>
+                    <div class="summary-info">
+                        <span class="summary-value" id="totalRevenue">₹0</span>
+                        <span class="summary-label">Total Revenue</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="summary-info">
+                        <span class="summary-value" id="successfulPayments">0</span>
+                        <span class="summary-label">Successful Payments</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <i class="fas fa-times-circle"></i>
+                    <div class="summary-info">
+                        <span class="summary-value" id="failedPayments">0</span>
+                        <span class="summary-label">Failed Payments</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="summary-info">
+                        <span class="summary-value" id="pendingPayments">0</span>
+                        <span class="summary-label">Pending Payments</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments Filters -->
+            <div class="payments-filters">
+                <div class="filter-group">
+                    <select id="statusFilter" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="methodFilter" class="form-control">
+                        <option value="">All Methods</option>
+                        <option value="razorpay">Razorpay</option>
+                        <option value="cod">Cash on Delivery</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <input type="date" id="dateFilter" class="form-control">
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search payments...">
+                </div>
+            </div>
+
+            <!-- Payments Table -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        <!-- Payments will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Payment Details Modal -->
+            <div class="modal" id="paymentModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Payment Details</h2>
+                        <button class="close-modal" id="closeModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="payment-info">
+                            <div class="info-group">
+                                <h3>Payment Information</h3>
+                                <p><strong>Payment ID:</strong> <span id="modalPaymentId"></span></p>
+                                <p><strong>Order ID:</strong> <span id="modalOrderId"></span></p>
+                                <p><strong>Amount:</strong> <span id="modalAmount"></span></p>
+                                <p><strong>Method:</strong> <span id="modalMethod"></span></p>
+                                <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+                                <p><strong>Date:</strong> <span id="modalDate"></span></p>
+                            </div>
+                            <div class="info-group">
+                                <h3>Customer Information</h3>
+                                <p><strong>Name:</strong> <span id="modalCustomerName"></span></p>
+                                <p><strong>Email:</strong> <span id="modalCustomerEmail"></span></p>
+                                <p><strong>Phone:</strong> <span id="modalCustomerPhone"></span></p>
+                            </div>
+                        </div>
+                        <div class="payment-details">
+                            <h3>Transaction Details</h3>
+                            <div id="transactionDetails">
+                                <!-- Transaction details will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const paymentsTableBody = document.getElementById('paymentsTableBody');
+            const paymentModal = document.getElementById('paymentModal');
+            const closeModal = document.getElementById('closeModal');
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const methodFilter = document.getElementById('methodFilter');
+            const dateFilter = document.getElementById('dateFilter');
+
+            // Update summary
+            function updateSummary(payments) {
+                const totalRevenue = payments.reduce((sum, payment) => 
+                    payment.status === 'completed' ? sum + payment.amount : sum, 0);
+                const successfulPayments = payments.filter(p => p.status === 'completed').length;
+                const failedPayments = payments.filter(p => p.status === 'failed').length;
+                const pendingPayments = payments.filter(p => p.status === 'pending').length;
+
+                document.getElementById('totalRevenue').textContent = UI.formatCurrency(totalRevenue);
+                document.getElementById('successfulPayments').textContent = successfulPayments;
+                document.getElementById('failedPayments').textContent = failedPayments;
+                document.getElementById('pendingPayments').textContent = pendingPayments;
+            }
+
+            // Show modal
+            function showPaymentDetails(payment) {
+                // Update payment information
+                document.getElementById('modalPaymentId').textContent = payment.id;
+                document.getElementById('modalOrderId').textContent = payment.orderId;
+                document.getElementById('modalAmount').textContent = UI.formatCurrency(payment.amount);
+                document.getElementById('modalMethod').textContent = payment.method;
+                document.getElementById('modalStatus').textContent = payment.status;
+                document.getElementById('modalDate').textContent = UI.formatDate(payment.createdAt);
+                
+                // Update customer information (mock data for demo)
+                document.getElementById('modalCustomerName').textContent = 'John Doe';
+                document.getElementById('modalCustomerEmail').textContent = 'john@example.com';
+                document.getElementById('modalCustomerPhone').textContent = '1234567890';
+                
+                // Update transaction details
+                const transactionDetails = document.getElementById('transactionDetails');
+                if (payment.method === 'razorpay') {
+                    transactionDetails.innerHTML = `
+                        <div class="transaction-info">
+                            <p><strong>Transaction ID:</strong> ${payment.id}</p>
+                            <p><strong>Payment Gateway:</strong> Razorpay</p>
+                            <p><strong>Payment Status:</strong> ${payment.status}</p>
+                            <p><strong>Payment Date:</strong> ${UI.formatDate(payment.createdAt)}</p>
+                        </div>
+                    `;
+                } else {
+                    transactionDetails.innerHTML = `
+                        <div class="transaction-info">
+                            <p><strong>Payment Method:</strong> Cash on Delivery</p>
+                            <p><strong>Payment Status:</strong> ${payment.status}</p>
+                            <p><strong>Payment Date:</strong> ${UI.formatDate(payment.createdAt)}</p>
+                        </div>
+                    `;
+                }
+                
+                paymentModal.style.display = 'block';
+            }
+
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                paymentModal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === paymentModal) {
+                    paymentModal.style.display = 'none';
+                }
+            });
+
+            // Load payments
+            async function loadPayments() {
+                try {
+                    UI.showLoading();
+                    const payments = await ApiService.getPayments();
+                    updateSummary(payments);
+                    renderPayments(payments);
+                } catch (error) {
+                    UI.showNotification('Error loading payments', 'error');
+                } finally {
+                    UI.hideLoading();
+                }
+            }
+
+            // Render payments
+            function renderPayments(payments) {
+                paymentsTableBody.innerHTML = '';
+                
+                let filteredPayments = [...payments];
+
+                // Apply search filter
+                const searchTerm = searchInput.value.toLowerCase();
+                if (searchTerm) {
+                    filteredPayments = filteredPayments.filter(payment => 
+                        payment.id.toString().includes(searchTerm) ||
+                        payment.orderId.toString().includes(searchTerm)
+                    );
+                }
+
+                // Apply status filter
+                const status = statusFilter.value;
+                if (status) {
+                    filteredPayments = filteredPayments.filter(payment => 
+                        payment.status === status
+                    );
+                }
+
+                // Apply method filter
+                const method = methodFilter.value;
+                if (method) {
+                    filteredPayments = filteredPayments.filter(payment => 
+                        payment.method === method
+                    );
+                }
+
+                // Apply date filter
+                const date = dateFilter.value;
+                if (date) {
+                    const filterDate = new Date(date).toDateString();
+                    filteredPayments = filteredPayments.filter(payment => 
+                        new Date(payment.createdAt).toDateString() === filterDate
+                    );
+                }
+
+                filteredPayments.forEach(payment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>#${payment.id}</td>
+                        <td>#${payment.orderId}</td>
+                        <td>John Doe</td>
+                        <td>${UI.formatCurrency(payment.amount)}</td>
+                        <td>${payment.method}</td>
+                        <td>
+                            <span class="badge badge-${getStatusClass(payment.status)}">
+                                ${payment.status}
+                            </span>
+                        </td>
+                        <td>${UI.formatDate(payment.createdAt)}</td>
+                        <td>
+                            <button class="btn btn-secondary" onclick='showPaymentDetails(${JSON.stringify(payment)})'>
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </td>
+                    `;
+                    paymentsTableBody.appendChild(row);
+                });
+            }
+
+            // Get status badge class
+            function getStatusClass(status) {
+                switch (status) {
+                    case 'completed': return 'success';
+                    case 'pending': return 'warning';
+                    case 'failed': return 'danger';
+                    default: return 'secondary';
+                }
+            }
+
+            // Handle filters
+            searchInput.addEventListener('input', () => loadPayments());
+            statusFilter.addEventListener('change', () => loadPayments());
+            methodFilter.addEventListener('change', () => loadPayments());
+            dateFilter.addEventListener('change', () => loadPayments());
+
+            // Initial load
+            loadPayments();
+        });
+    </script>
+</body>
+</html> 

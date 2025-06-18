@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Management - Bastiramji Mithai Wale</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../images/logo/bmw-logo.jpg" alt="BMW Logo">
+                <h2>Admin Panel</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a href="products.html" class="menu-item">
+                    <i class="fas fa-box"></i>
+                    Products
+                </a>
+                <a href="orders.html" class="menu-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    Orders
+                </a>
+                <a href="users.html" class="menu-item active">
+                    <i class="fas fa-users"></i>
+                    Users
+                </a>
+                <a href="payments.html" class="menu-item">
+                    <i class="fas fa-credit-card"></i>
+                    Payments
+                </a>
+                <a href="#" class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navbar -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <div class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                    <h1>Users Management</h1>
+                </div>
+                <div class="navbar-right">
+                    <div class="admin-profile">
+                        <img src="../images/admin-avatar.jpg" alt="Admin">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Users Filters -->
+            <div class="users-filters">
+                <div class="filter-group">
+                    <select id="statusFilter" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <input type="date" id="dateFilter" class="form-control">
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search users...">
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Joined Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- User Details Modal -->
+            <div class="modal" id="userModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">User Details</h2>
+                        <button class="close-modal" id="closeModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="user-info">
+                            <div class="info-group">
+                                <h3>User Information</h3>
+                                <p><strong>User ID:</strong> <span id="modalUserId"></span></p>
+                                <p><strong>Name:</strong> <span id="modalUserName"></span></p>
+                                <p><strong>Email:</strong> <span id="modalUserEmail"></span></p>
+                                <p><strong>Phone:</strong> <span id="modalUserPhone"></span></p>
+                                <p><strong>Status:</strong> <span id="modalUserStatus"></span></p>
+                                <p><strong>Joined Date:</strong> <span id="modalUserDate"></span></p>
+                            </div>
+                        </div>
+                        <div class="user-stats">
+                            <h3>User Statistics</h3>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-value" id="modalTotalOrders">0</span>
+                                        <span class="stat-label">Total Orders</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <i class="fas fa-rupee-sign"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-value" id="modalTotalSpent">₹0</span>
+                                        <span class="stat-label">Total Spent</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <i class="fas fa-box"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-value" id="modalLastOrder">-</span>
+                                        <span class="stat-label">Last Order</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <div class="form-group">
+                                <label for="userStatus">Update Status</label>
+                                <select id="userStatus" class="form-control">
+                                    <option value="active">Active</option>
+                                    <option value="blocked">Blocked</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="updateStatusBtn">Update Status</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const usersTableBody = document.getElementById('usersTableBody');
+            const userModal = document.getElementById('userModal');
+            const closeModal = document.getElementById('closeModal');
+            const updateStatusBtn = document.getElementById('updateStatusBtn');
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const dateFilter = document.getElementById('dateFilter');
+
+            let currentUserId = null;
+
+            // Show modal
+            function showUserDetails(user) {
+                currentUserId = user.id;
+                
+                // Update user information
+                document.getElementById('modalUserId').textContent = user.id;
+                document.getElementById('modalUserName').textContent = user.name;
+                document.getElementById('modalUserEmail').textContent = user.email;
+                document.getElementById('modalUserPhone').textContent = user.phone;
+                document.getElementById('modalUserStatus').textContent = user.status;
+                document.getElementById('modalUserDate').textContent = UI.formatDate(user.createdAt);
+                
+                // Update user statistics (mock data for demo)
+                document.getElementById('modalTotalOrders').textContent = '5';
+                document.getElementById('modalTotalSpent').textContent = UI.formatCurrency(5000);
+                document.getElementById('modalLastOrder').textContent = UI.formatDate(new Date());
+                
+                // Update status select
+                document.getElementById('userStatus').value = user.status;
+                
+                userModal.style.display = 'block';
+            }
+
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                userModal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === userModal) {
+                    userModal.style.display = 'none';
+                }
+            });
+
+            // Update user status
+            updateStatusBtn.addEventListener('click', async () => {
+                if (!currentUserId) return;
+                
+                const newStatus = document.getElementById('userStatus').value;
+                
+                try {
+                    UI.showLoading();
+                    await ApiService.updateUserStatus(currentUserId, newStatus);
+                    UI.showNotification('User status updated successfully');
+                    userModal.style.display = 'none';
+                    loadUsers();
+                } catch (error) {
+                    UI.showNotification('Error updating user status', 'error');
+                } finally {
+                    UI.hideLoading();
+                }
+            });
+
+            // Load users
+            async function loadUsers() {
+                try {
+                    UI.showLoading();
+                    const users = await ApiService.getUsers();
+                    renderUsers(users);
+                } catch (error) {
+                    UI.showNotification('Error loading users', 'error');
+                } finally {
+                    UI.hideLoading();
+                }
+            }
+
+            // Render users
+            function renderUsers(users) {
+                usersTableBody.innerHTML = '';
+                
+                let filteredUsers = [...users];
+
+                // Apply search filter
+                const searchTerm = searchInput.value.toLowerCase();
+                if (searchTerm) {
+                    filteredUsers = filteredUsers.filter(user => 
+                        user.id.toString().includes(searchTerm) ||
+                        user.name.toLowerCase().includes(searchTerm) ||
+                        user.email.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                // Apply status filter
+                const status = statusFilter.value;
+                if (status) {
+                    filteredUsers = filteredUsers.filter(user => 
+                        user.status === status
+                    );
+                }
+
+                // Apply date filter
+                const date = dateFilter.value;
+                if (date) {
+                    const filterDate = new Date(date).toDateString();
+                    filteredUsers = filteredUsers.filter(user => 
+                        new Date(user.createdAt).toDateString() === filterDate
+                    );
+                }
+
+                filteredUsers.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>#${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td>
+                            <span class="badge badge-${user.status === 'active' ? 'success' : 'danger'}">
+                                ${user.status}
+                            </span>
+                        </td>
+                        <td>${UI.formatDate(user.createdAt)}</td>
+                        <td>
+                            <button class="btn btn-secondary" onclick='showUserDetails(${JSON.stringify(user)})'>
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </td>
+                    `;
+                    usersTableBody.appendChild(row);
+                });
+            }
+
+            // Handle filters
+            searchInput.addEventListener('input', () => loadUsers());
+            statusFilter.addEventListener('change', () => loadUsers());
+            dateFilter.addEventListener('change', () => loadUsers());
+
+            // Initial load
+            loadUsers();
+        });
+    </script>
+</body>
+</html> 
