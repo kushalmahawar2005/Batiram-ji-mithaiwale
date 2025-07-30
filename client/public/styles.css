@@ -7,9 +7,9 @@
 }
 
 :root {
-    --primary-color: #D4AF37;
-    --secondary-color: #8B0000;
-    --background-color: #FFF8DC;
+    --primary-color: #0066B1; /* BMW Blue */
+    --secondary-color: #8B0000; /* BMW Red */
+    --background-color: #FFFFFF; /* White */
     --text-color: #333;
     --white: #ffffff;
 }
@@ -18,7 +18,9 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
-    padding-top: 80px;
+    padding-top: 60px;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 /* Header Styles */
@@ -133,6 +135,8 @@ body {
 }
 
 /* Hero Section Specific Styles */
+
+
 .hero .section-header {
     margin-bottom: 2rem;
 }
@@ -158,6 +162,8 @@ body {
     position: relative;
     height: 100vh;
     overflow: hidden;
+    margin-top: 0 ;
+    padding-top: 0 ;
 }
 
 .video-background {
@@ -166,8 +172,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
+  
 }
+
 
 .video-background video {
     width: 100%;
@@ -181,8 +188,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1;
+    
 }
 
 .hero-content {
@@ -859,6 +865,9 @@ section.animate {
     padding: 0.5rem;
     font-weight: 500;
     animation: slideDown 0.5s ease-out;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
 }
 
 @keyframes slideDown {
@@ -5022,3 +5031,747 @@ section.animate {
 .notification.info {
     border-left: 4px solid #2196F3;
 }
+
+/* Custom Hero Image Slider Styles */
+.custom-slider {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0 auto;
+}
+.custom-slider .slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.custom-slider .slide.active {
+  opacity: 1;
+  z-index: 2;
+}
+.custom-slider img {
+  width: 100%;
+  height:80vh;
+  object-fit : cover;
+  display: block;
+}
+.custom-slider .slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.4);
+  color: #fff;
+  border: none;
+  font-size: 2.5rem;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 80%;
+  transition: background 0.2s;
+}
+.custom-slider .slider-btn.prev { left: 30px; }
+.custom-slider .slider-btn.next { right: 30px; }
+.custom-slider .slider-btn:hover { background: rgba(139,0,0,0.8); }
+.custom-slider .slider-dots {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+.custom-slider .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s, background 0.2s;
+  border: 2px solid #8B0000;
+}
+.custom-slider .dot.active {
+  opacity: 1;
+  background: #8B0000;
+}
+@media (max-width: 900px) {
+  .custom-slider, .custom-slider img {
+    height: 60vh;
+  }
+}
+@media (max-width: 600px) {
+  .custom-slider, .custom-slider img {
+    height: 35vh;
+  }
+  .custom-slider .slider-btn {
+    font-size: 1.5rem;
+    padding: 0.3rem 0.7rem;
+  }
+  .custom-slider .slider-dots {
+    bottom: 10px;
+  }
+}
+
+/* Make slider buttons smaller */
+.custom-slider .slider-btn {
+  font-size: 1.0rem;
+  padding: 0.1rem 0.7rem;
+}
+@media (max-width: 600px) {
+  .custom-slider .slider-btn {
+    font-size: 1.1rem;
+    padding: 0.15rem 0.4rem;
+  }
+}
+
+/* ===== RESPONSIVE DESIGN - MOBILE FIRST APPROACH ===== */
+
+/* 1. Global Responsive Reset */
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 2. Responsive Images */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 3. Responsive Container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* 4. Responsive Typography */
+h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+h2 { font-size: clamp(1.3rem, 3.5vw, 2rem); }
+h3 { font-size: clamp(1.1rem, 3vw, 1.5rem); }
+p { font-size: clamp(0.9rem, 2.5vw, 1rem); }
+
+/* 5. Responsive Navigation */
+@media (max-width: 900px) {
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    flex-direction: column;
+    padding: 1rem;
+    z-index: 1000;
+  }
+  
+  .nav-links.active {
+    display: flex;
+  }
+  
+  .nav-links li {
+    margin: 0.5rem 0;
+  }
+  
+  .search-bar {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .logo-text h1 {
+    font-size: 1rem;
+  }
+  
+  .logo img {
+    height: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0.3rem 0.5rem;
+  }
+  
+  .logo-text h1 {
+    font-size: 0.9rem;
+  }
+  
+  .logo img {
+    height: 35px;
+  }
+  
+  .nav-icons {
+    gap: 0.5rem;
+  }
+  
+  .nav-icons a, .nav-icons div {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* 6. Responsive Hero/Slider */
+@media (max-width: 900px) {
+  .custom-slider, .custom-slider img {
+    height: 60vh;
+    min-height: 300px;
+  }
+  
+  .custom-slider .slider-btn {
+    font-size: 1.2rem;
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .custom-slider .slider-dots {
+    bottom: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .custom-slider, .custom-slider img {
+    height: 40vh;
+    min-height: 200px;
+  }
+  
+  .custom-slider .slider-btn {
+    font-size: 1rem;
+    padding: 0.1rem 0.3rem;
+  }
+  
+  .custom-slider .slider-btn.prev { left: 10px; }
+  .custom-slider .slider-btn.next { right: 10px; }
+  
+  .custom-slider .slider-dots {
+    bottom: 10px;
+    gap: 8px;
+  }
+  
+  .custom-slider .dot {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* 7. Responsive Grids */
+@media (max-width: 1200px) {
+  .gallery-grid, .namkeen-grid, .boxes-grid, .owners-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .gallery-grid, .namkeen-grid, .boxes-grid, .owners-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+  
+  .signature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .gallery-grid, .namkeen-grid, .boxes-grid, .owners-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .signature-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 8. Responsive Cards */
+@media (max-width: 900px) {
+  .namkeen-card, .box-card, .owner-card, .signature-card {
+    max-width: none;
+  }
+  
+  .namkeen-content, .box-content, .owner-content, .signature-content {
+    padding: 1rem;
+  }
+  
+  .namkeen-image, .box-image, .owner-image, .signature-image {
+    height: 150px;
+  }
+}
+
+@media (max-width: 600px) {
+  .namkeen-content, .box-content, .owner-content, .signature-content {
+    padding: 0.8rem;
+  }
+  
+  .namkeen-image, .box-image, .owner-image, .signature-image {
+    height: 120px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .view-details-btn, .add-cart-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* 9. Responsive Sections */
+@media (max-width: 900px) {
+  section {
+    padding: 2rem 0;
+  }
+  
+  .section-header {
+    margin-bottom: 2rem;
+  }
+  
+  .section-header h1, .section-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .section-header p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  section {
+    padding: 1.5rem 0;
+  }
+  
+  .section-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-header h1, .section-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .section-header p {
+    font-size: 0.9rem;
+  }
+}
+
+/* 10. Responsive Footer */
+@media (max-width: 900px) {
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  .footer-section h3 {
+    font-size: 1.2rem;
+  }
+  
+  .footer-section ul li {
+    margin: 0.3rem 0;
+  }
+}
+
+/* 11. Responsive Modals */
+@media (max-width: 900px) {
+  .modal-content {
+    width: 95%;
+    max-width: 500px;
+    margin: 2rem auto;
+  }
+  
+  .sweet-details-content, .namkeen-details-content, .box-details-content {
+    flex-direction: column;
+  }
+  
+  .sweet-image-large, .namkeen-image-large, .box-image-large {
+    width: 100%;
+    height: 200px;
+  }
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    width: 98%;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
+  
+  .sweet-image-large, .namkeen-image-large, .box-image-large {
+    height: 150px;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.3rem;
+  }
+}
+
+/* 12. Responsive Cart */
+@media (max-width: 900px) {
+  .cart-modal {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .cart-content {
+    padding: 1rem;
+  }
+  
+  .cart-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .cart-item img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cart-content {
+    padding: 0.8rem;
+  }
+  
+  .cart-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .cart-item img {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* 13. Responsive Forms */
+@media (max-width: 600px) {
+  .contact-form {
+    padding: 1rem;
+  }
+  
+  .form-group input, .form-group textarea {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .submit-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* 14. Responsive Special Offers */
+@media (max-width: 900px) {
+  .offers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .offers-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .offer-card {
+    max-width: none;
+  }
+}
+
+/* 15. Responsive Heritage Section */
+@media (max-width: 900px) {
+  .heritage-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .heritage-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .heritage-features {
+    grid-template-columns: 1fr;
+  }
+  
+  .heritage-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .heritage-text h2 {
+    font-size: 1.5rem;
+  }
+  
+  .heritage-description {
+    font-size: 0.9rem;
+  }
+}
+
+/* 16. Responsive Memories Section */
+@media (max-width: 900px) {
+  .memories-slider {
+    height: 300px;
+  }
+  
+  .memory-image {
+    height: 200px;
+  }
+}
+
+@media (max-width: 600px) {
+  .memories-slider {
+    height: 250px;
+  }
+  
+  .memory-image {
+    height: 150px;
+  }
+  
+  .memory-content h3 {
+    font-size: 1.1rem;
+  }
+  
+  .memory-content p {
+    font-size: 0.8rem;
+  }
+}
+
+/* 17. Responsive Social Share */
+@media (max-width: 600px) {
+  .social-share {
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .social-share a {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+}
+
+/* 18. Responsive Advanced Filters */
+@media (max-width: 900px) {
+  .advanced-filters {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .filter-group {
+    justify-content: center;
+  }
+  
+  .sort-group {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .filter-group {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .filter-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .sort-select {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* 19. Responsive View More Buttons */
+@media (max-width: 600px) {
+  .view-more-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .view-more-btn i {
+    font-size: 0.8rem;
+  }
+}
+
+/* 20. Responsive Toast Notifications */
+@media (max-width: 600px) {
+  .toast {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    font-size: 0.9rem;
+    padding: 0.8rem 1rem;
+  }
+}
+
+/* 21. Responsive Loading States */
+@media (max-width: 600px) {
+  .loading-spinner {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* 22. Responsive Print Styles */
+@media print {
+  .header, .footer, .nav-icons, .slider-btn, .social-share {
+    display: none !important;
+  }
+  
+  body {
+    padding-top: 0 !important;
+  }
+  
+  .custom-slider {
+    height: auto !important;
+  }
+  
+  .custom-slider img {
+    height: auto !important;
+  }
+}
+
+/* 23. High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* 24. Landscape Mobile */
+@media (max-width: 900px) and (orientation: landscape) {
+  .custom-slider, .custom-slider img {
+    height: 50vh;
+  }
+  
+  .navbar {
+    padding: 0.3rem 1rem;
+  }
+  
+  .logo img {
+    height: 30px;
+  }
+}
+
+/* 25. Large Screens */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1400px;
+  }
+  
+  .custom-slider, .custom-slider img {
+    height: 80vh;
+  }
+  
+  .section-header h1, .section-header h2 {
+    font-size: 3rem;
+  }
+}
+
+/* 26. Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 27. Dark Mode Support */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #1a1a1a;
+    --text-color: #ffffff;
+    --white: #2d2d2d;
+  }
+} */
+
+/* 28. Focus States for Accessibility */
+@media (any-hover: hover) {
+  .nav-links a:hover,
+  .cta-button:hover,
+  .view-details-btn:hover,
+  .add-cart-btn:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* 29. Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .slider-btn,
+  .view-details-btn,
+  .add-cart-btn,
+  .nav-links a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .dot {
+    min-width: 20px;
+    min-height: 20px;
+  }
+}
+
+/* 30. Final Responsive Overrides */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  .section-header {
+    padding: 0 0.5rem;
+  }
+  
+  .custom-slider .slider-btn {
+    font-size: 0.8rem;
+    padding: 0.1rem 0.2rem;
+  }
+  
+  .custom-slider .slider-btn.prev { left: 5px; }
+  .custom-slider .slider-btn.next { right: 5px; }
+}
+
+/* ===== END RESPONSIVE DESIGN ===== */
