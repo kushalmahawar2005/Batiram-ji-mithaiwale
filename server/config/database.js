@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
+    // Commented out for development without MongoDB
+    console.log('MongoDB connection disabled for development');
+    return;
+    
+    /*
     try {
         const conn = await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
@@ -36,6 +41,7 @@ const connectDB = async () => {
         // Retry connection after 5 seconds
         setTimeout(connectDB, 5000);
     }
+    */
 };
 
 module.exports = connectDB; 

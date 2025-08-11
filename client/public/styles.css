@@ -7,7 +7,7 @@
 }
 
 :root {
-    --primary-color: #0066B1; /* BMW Blue */
+    --primary-color: #C99F26; /* BMW Blue */
     --secondary-color: #8B0000; /* BMW Red */
     --background-color: #FFFFFF; /* White */
     --text-color: #333;
@@ -1992,6 +1992,7 @@ section.animate {
 
 /* Memories Gallery Section */
 .memories {
+    
     padding: 80px 0;
     background: #f9f9f9;
     position: relative;
@@ -2018,6 +2019,7 @@ section.animate {
     height: 500px;
     overflow: hidden;
     margin-bottom: 50px;
+    
 }
 
 .memory-slide {
@@ -2028,6 +2030,7 @@ section.animate {
     transition: opacity 0.5s ease-in-out;
     display: flex;
     justify-content: center;
+    margin-left: 100px;
 }
 
 .memory-slide.active {

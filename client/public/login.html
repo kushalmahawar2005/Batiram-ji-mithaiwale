@@ -236,6 +236,10 @@
             const phoneInput = document.getElementById('phone');
             const otpInputs = document.querySelectorAll('.otp-inputs input');
             let timerInterval;
+            let currentPhone = '';
+
+            // API Base URL
+            const API_BASE_URL = 'http://localhost:5000/api/users';
 
             // Handle OTP input
             otpInputs.forEach((input, index) => {
@@ -270,32 +274,201 @@
                 }, 1000);
             }
 
+            // Send OTP API call
+            async function sendOTP(phone) {
+                try {
+                    console.log('Sending OTP to:', phone);
+                    console.log('API URL:', `${API_BASE_URL}/send-otp`);
+                    
+                    const response = await fetch(`${API_BASE_URL}/send-otp`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ phone })
+                    });
+
+                    console.log('Response status:', response.status);
+                    const data = await response.json();
+                    console.log('Response data:', data);
+
+                    if (response.ok) {
+                        return { success: true, message: data.message };
+                    } else {
+                        return { success: false, message: data.message || 'Failed to send OTP' };
+                    }
+                } catch (error) {
+                    console.error('Send OTP error:', error);
+                    
+                    // Check if it's a network error
+                    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                        return { 
+                            success: false, 
+                            message: 'Network error: Please check if the server is running on port 5000' 
+                        };
+                    }
+                    
+                    return { success: false, message: 'Network error. Please try again.' };
+                }
+            }
+
+            // Verify OTP API call
+            async function verifyOTP(phone, otp) {
+                try {
+                    console.log('Verifying OTP for:', phone);
+                    console.log('OTP:', otp);
+                    
+                    const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ phone, otp })
+                    });
+
+                    console.log('Verify response status:', response.status);
+                    const data = await response.json();
+                    console.log('Verify response data:', data);
+
+                    if (response.ok) {
+                        return { success: true, data: data };
+                    } else {
+                        return { success: false, message: data.message || 'Failed to verify OTP' };
+                    }
+                } catch (error) {
+                    console.error('Verify OTP error:', error);
+                    
+                    // Check if it's a network error
+                    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                        return { 
+                            success: false, 
+                            message: 'Network error: Please check if the server is running on port 5000' 
+                        };
+                    }
+                    
+                    return { success: false, message: 'Network error. Please try again.' };
+                }
+            }
+
+            // Show notification
+            function showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 1rem 2rem;
+                    border-radius: 4px;
+                    color: white;
+                    font-weight: 500;
+                    z-index: 10000;
+                    animation: slideIn 0.3s ease;
+                `;
+                
+                if (type === 'success') {
+                    notification.style.backgroundColor = '#4CAF50';
+                } else if (type === 'error') {
+                    notification.style.backgroundColor = '#f44336';
+                } else {
+                    notification.style.backgroundColor = '#2196F3';
+                }
+                
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
             // Handle send OTP
-            sendOtpBtn.addEventListener('click', (e) => {
+            sendOtpBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                if (phoneInput.checkValidity()) {
-                    // Simulate OTP sending
+                
+                if (!phoneInput.checkValidity()) {
+                    showNotification('Please enter a valid 10-digit phone number', 'error');
+                    return;
+                }
+
+                const phone = phoneInput.value;
+                currentPhone = phone;
+                
+                // Disable button and show loading
+                sendOtpBtn.disabled = true;
+                sendOtpBtn.textContent = 'Sending OTP...';
+
+                const result = await sendOTP(phone);
+
+                if (result.success) {
+                    showNotification(result.message, 'success');
                     phoneSection.style.display = 'none';
                     otpSection.classList.add('show');
                     startTimer();
+                } else {
+                    showNotification(result.message, 'error');
                 }
+
+                // Re-enable button
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.textContent = 'Send OTP';
             });
 
             // Handle verify OTP
-            verifyOtpBtn.addEventListener('click', (e) => {
+            verifyOtpBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
+                
                 const otp = Array.from(otpInputs).map(input => input.value).join('');
-                if (otp.length === 6) {
-                    // Simulate OTP verification
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userPhone', phoneInput.value);
-                    window.location.href = 'checkout.html';
+                
+                if (otp.length !== 6) {
+                    showNotification('Please enter 6-digit OTP', 'error');
+                    return;
                 }
+
+                // Disable button and show loading
+                verifyOtpBtn.disabled = true;
+                verifyOtpBtn.textContent = 'Verifying...';
+
+                const result = await verifyOTP(currentPhone, otp);
+
+                if (result.success) {
+                    showNotification('Login successful!', 'success');
+                    
+                    // Store user data
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userToken', result.data.token);
+                    localStorage.setItem('userPhone', result.data.user.phone);
+                    localStorage.setItem('userName', result.data.user.name);
+                    
+                    // Redirect to checkout or home
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showNotification(result.message, 'error');
+                }
+
+                // Re-enable button
+                verifyOtpBtn.disabled = false;
+                verifyOtpBtn.textContent = 'Verify OTP';
             });
 
             // Handle resend OTP
-            resendOtpBtn.addEventListener('click', () => {
-                startTimer();
+            resendOtpBtn.addEventListener('click', async () => {
+                if (!currentPhone) {
+                    showNotification('Please enter phone number first', 'error');
+                    return;
+                }
+
+                const result = await sendOTP(currentPhone);
+                
+                if (result.success) {
+                    showNotification('OTP resent successfully', 'success');
+                    startTimer();
+                } else {
+                    showNotification(result.message, 'error');
+                }
             });
 
             // Handle back to phone
@@ -305,7 +478,20 @@
                 clearInterval(timerInterval);
                 resendOtpBtn.disabled = false;
                 document.getElementById('timer').textContent = '';
+                
+                // Clear OTP inputs
+                otpInputs.forEach(input => input.value = '');
             });
+
+            // Add CSS for notification animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
         });
     </script>
 </body>
