@@ -39,16 +39,7 @@ yarn-error.log*
 *.tar
 *.gz
 
-# Images
-client/public/images/shop/*.jpg
-client/public/images/shop/*.jpeg
-client/public/images/shop/*.png
-client/public/images/shop/*.gif
-client/public/images/memories/*.msi
 
-# Keep image directories but ignore contents
-!client/public/images/shop/
-!client/public/images/memories/
 
 # Server specific
 server/node_modules/
